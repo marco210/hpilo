@@ -14,14 +14,14 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 	//response, err := http.Get("http://localhost:8080/static/test.json")
 	// var err error
 	conf := gofish.ClientConfig{
-		Endpoint: r.URL.Query().Get("192.169.2.2"),
+		Endpoint: r.URL.Query().Get("https://192.169.2.2"),
 		// Endpoint: r.URL.Query().Get("localhost:8080/static/test.json"),
 		Username: "username",
 		Password: "password",
 		Insecure: true,
 	}
 
-	fmt.Println(r.URL.Query().Get("192.169.2.2"))
+	fmt.Println(r.URL.Query().Get("https://192.169.2.2"))
 
 	var err error
 	config.GOFISH, err = gofish.Connect(conf)
@@ -29,10 +29,10 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
+	} else {
+		fmt.Println("Connected")
 	}
 	defer config.GOFISH.Logout()
-
-	//defer config.GOFISH.Logout()
 
 	fmt.Println(" Connect successful")
 
