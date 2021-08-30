@@ -44,3 +44,24 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 
 	}
 }
+
+func (chassis Chassis) collectTemperature(ch chan<- prometheus.Metric, chass *redfish.Chassis) {
+	thermals, _ := chass.Thermal()
+
+	if nil != thermals {
+		temperatures := thermals.Temperatures
+
+		for _, temp := range temperatures {
+			ch <- prometheus.MustNewConstMetric(config.C_temperature_status,
+				prometheus.GaugeValue,
+				float64(temp.ReadingCelsius),
+				temp.MemberID,
+				fmt.Sprintf("%v", temp.SensorNumber),
+				string(temp.Status.Health),
+				string(temp.Status.State),
+				fmt.Sprintf("%v", temp.UpperThresholdCritical),
+				fmt.Sprintf("%v", temp.UpperThresholdFatal),
+			)
+		}
+	}
+}
