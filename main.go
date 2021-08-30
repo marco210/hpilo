@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hpilo_exporter/collector"
 	"hpilo_exporter/config"
 	"net/http"
 
@@ -32,6 +33,7 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Println("Connected")
 	}
+
 	defer config.GOFISH.Logout()
 
 	fmt.Println(" Connect successful")
@@ -55,8 +57,8 @@ func main() {
 	// fmt.Printf("%v", system)
 	// prometheus.Register(system)
 
-	// chassis := chassis.Chassis{}
-	// prometheus.Register(chassis)
+	chassis := collector.Chassis{}
+	prometheus.Register(chassis)
 
 	// Starting server
 	http.HandleFunc("/metrics", metrichandler)
