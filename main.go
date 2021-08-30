@@ -12,17 +12,15 @@ import (
 )
 
 func metrichandler(w http.ResponseWriter, r *http.Request) {
-	//response, err := http.Get("http://localhost:8080/static/test.json")
 	// var err error
 	conf := gofish.ClientConfig{
-		Endpoint: r.URL.Query().Get("https://192.169.2.2"),
-		// Endpoint: r.URL.Query().Get("localhost:8080/static/test.json"),
+		Endpoint: r.URL.Query().Get("ilo_host"),
 		Username: "username",
 		Password: "password",
 		Insecure: true,
 	}
 
-	fmt.Println(r.URL.Query().Get("https://192.169.2.2"))
+	fmt.Println(r.URL.Query().Get("ilo_host"))
 
 	var err error
 	config.GOFISH, err = gofish.Connect(conf)
@@ -59,7 +57,7 @@ func main() {
 
 	chassis := collector.Chassis{}
 	prometheus.Register(chassis)
-
+	fmt.Println(IP_ADDRESS)
 	// Starting server
 	http.HandleFunc("/metrics", metrichandler)
 	http.ListenAndServe(IP_ADDRESS, nil)
