@@ -11,6 +11,7 @@ import (
 type Chassis struct{}
 
 func (chassis Chassis) Describe(ch chan<- *prometheus.Desc) {
+	ch <- config.C_temperature_status
 	ch <- config.C_power_line_input_voltage
 }
 
