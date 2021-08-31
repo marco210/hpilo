@@ -13,6 +13,7 @@ type Chassis struct{}
 func (chassis Chassis) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.C_temperature_status
 	ch <- config.C_power_line_input_voltage
+	ch <- config.C_networkadapter
 }
 
 func (chass Chassis) Collect(ch chan<- prometheus.Metric) {
@@ -26,6 +27,7 @@ func (chass Chassis) Collect(ch chan<- prometheus.Metric) {
 	for _, chassis := range chassisArr {
 		chass.collectPowerLineInputVoltage(ch, chassis)
 		chass.collectTemperature(ch, chassis)
+		chass.CollectNetworkAdapter(ch, chassis)
 	}
 }
 
@@ -56,7 +58,7 @@ func (chassis Chassis) collectTemperature(ch chan<- prometheus.Metric, chass *re
 		for _, temp := range temperatures {
 			ch <- prometheus.MustNewConstMetric(config.C_temperature_status,
 				prometheus.GaugeValue,
-				float64(0),
+				float64(temp.ReadingCelsius),
 				fmt.Sprintf("%v", temp.ReadingCelsius),
 				temp.MemberID,
 				fmt.Sprintf("%v", temp.SensorNumber),
@@ -64,6 +66,30 @@ func (chassis Chassis) collectTemperature(ch chan<- prometheus.Metric, chass *re
 				string(temp.Status.State),
 				fmt.Sprintf("%v", temp.UpperThresholdCritical),
 				fmt.Sprintf("%v", temp.UpperThresholdFatal),
+			)
+		}
+	}
+}
+
+func (chassis Chassis) CollectNetworkAdapter(ch chan<- prometheus.Metric, chass *redfish.Chassis) {
+	adapters, err := chass.NetworkAdapters()
+
+	if nil != err {
+		panic(err)
+	}
+
+	if 0 != len(adapters) {
+		for _, adapter := range adapters {
+			status := config.State_dict[string(adapter.Status.Health)]
+			ch <- prometheus.MustNewConstMetric(config.C_networkadapter,
+				prometheus.GaugeValue,
+				float64(status),
+				adapter.Description,
+				adapter.Manufacturer,
+				adapter.Model,
+				adapter.PartNumber,
+				adapter.SKU,
+				adapter.SerialNumber,
 			)
 		}
 	}
