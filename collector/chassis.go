@@ -25,6 +25,7 @@ func (chass Chassis) Collect(ch chan<- prometheus.Metric) {
 
 	for _, chassis := range chassisArr {
 		chass.collectPowerLineInputVoltage(ch, chassis)
+		chass.collectTemperature(ch, chassis)
 	}
 }
 
