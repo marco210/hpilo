@@ -56,7 +56,8 @@ func (chassis Chassis) collectTemperature(ch chan<- prometheus.Metric, chass *re
 		for _, temp := range temperatures {
 			ch <- prometheus.MustNewConstMetric(config.C_temperature_status,
 				prometheus.GaugeValue,
-				float64(temp.ReadingCelsius),
+				float64(0),
+				fmt.Sprintf("%v", temp.ReadingCelsius),
 				temp.MemberID,
 				fmt.Sprintf("%v", temp.SensorNumber),
 				string(temp.Status.Health),
