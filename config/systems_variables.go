@@ -26,7 +26,7 @@ var (
 
 	// S_memory => system's memory
 	S_memory = prometheus.NewDesc(
-		"idrac_system_memory_status",
+		"hpilo_system_memory_status",
 		"System Memory {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",
@@ -50,7 +50,7 @@ var (
 
 	// S_processor => system's processor
 	S_processor = prometheus.NewDesc(
-		"idrac_system_processor_status",
+		"hpilo_system_processor_status",
 		"System processor {0: OK, 1:Warning, 2: Critical}",
 		[]string{
 			"actions",
@@ -73,7 +73,7 @@ var (
 
 	// S_bios => system's bios
 	S_bios = prometheus.NewDesc(
-		"idrac_system_bios",
+		"hpilo_system_bios",
 		"System bios",
 		[]string{
 			"attribute_registry",
