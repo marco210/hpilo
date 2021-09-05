@@ -1,0 +1,146 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#NetworkAdapter.NetworkAdapter",
+    "@odata.etag": "W/\"D70EC319\"",
+    "@odata.id": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000",
+    "@odata.type": "#NetworkAdapter.v1_4_0.NetworkAdapter",
+    "Id": "DC01D000",
+    "Actions": {
+      "#NetworkAdapter.ResetSettingsToDefault": {
+        "target": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/Actions/NetworkAdapter.ResetSettingsToDefault",
+        "title": "Reset network adapter configuration to factory default values."
+      }
+    },
+    "Controllers": [
+      {
+        "ControllerCapabilities": {
+          "DataCenterBridging": {
+            "Capable": true
+          },
+          "NPAR": {
+            "NparEnabled": false
+          },
+          "NPIV": {},
+          "NetworkDeviceFunctionCount": 2,
+          "NetworkPortCount": 2,
+          "VirtualizationOffload": {
+            "SRIOV": {
+              "SRIOVVEPACapable": true
+            },
+            "VirtualFunction": {
+              "DeviceMaxCount": 128,
+              "MinAssignmentGroupSize": 16,
+              "NetworkPortMaxCount": 128
+            }
+          }
+        },
+        "FirmwarePackageVersion": "10.51.5",
+        "Links": {
+          "NetworkPorts": [
+            {
+              "@odata.id": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/NetworkPorts/1"
+            },
+            {
+              "@odata.id": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/NetworkPorts/2"
+            }
+          ]
+        },
+        "Location": {
+          "PartLocation": {
+            "LocationOrdinalValue": 0,
+            "LocationType": "Slot",
+            "ServiceLabel": "Embedded ALOM"
+          }
+        }
+      }
+    ],
+    "Description": "Device capabilities and characteristics with active configuration status",
+    "Manufacturer": "Hewlett Packard Enterprise",
+    "Model": "HPE Ethernet 10Gb 2-port 562FLR-SFP+ Adpt",
+    "Name": "Network communication device, physical instance viewpoint",
+    "NetworkDeviceFunctions": {
+      "@odata.id": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/NetworkDeviceFunctions/"
+    },
+    "NetworkPorts": {
+      "@odata.id": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/NetworkPorts/"
+    },
+    "Oem": {
+      "Hpe": {
+        "@odata.context": "/redfish/v1/$metadata#HpeNetworkAdapter.HpeNetworkAdapter",
+        "@odata.type": "#HpeNetworkAdapter.v1_3_0.HpeNetworkAdapter",
+        "Actions": {
+          "#HpeNetworkAdapter.FlushConfigurationToNVM": {
+            "target": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/Actions/Oem/Hpe/HpeNetworkAdapter.FlushConfigurationToNVM",
+            "title": "Force a save of current network adapter configuration to non-volatile storage."
+          },
+          "#NetworkAdapter.FlushConfigurationToNVM": {
+            "target": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/Actions/Oem/Hpe/NetworkAdapter.FlushConfigurationToNVM",
+            "title": "NOTE: Deprecated, will be removed in a future release. Replaced by HpeNetworkAdapter.FlushConfigurationToNVM. Force a save of current network adapter configuration to non-volatile storage."
+          }
+        },
+        "CLPVersion": "",
+        "Controllers": [
+          {
+            "ConfigurationStatus": {
+              "Detail": [
+                {
+                  "Group": 6,
+                  "SubGroup": 0,
+                  "Summary": 0
+                },
+                {
+                  "Group": 8,
+                  "SubGroup": 1,
+                  "Summary": 0
+                },
+                {
+                  "Group": 8,
+                  "SubGroup": 2,
+                  "Summary": 0
+                },
+                {
+                  "Group": 38,
+                  "SubGroup": 0,
+                  "Summary": 0
+                },
+                {
+                  "Group": 38,
+                  "SubGroup": 0,
+                  "Summary": 0
+                }
+              ],
+              "Summary": -1
+            },
+            "DeviceLimitationsBitmap": 0,
+            "EdgeVirtualBridging": {
+              "ChannelDescriptionTLVCapable": true,
+              "ChannelLinkControlTLVCapable": true
+            },
+            "EmbeddedLLDPFunctions": {
+              "Enabled": true,
+              "Optional": true
+            },
+            "FactoryDefaultsCurrentlyActive": true,
+            "FunctionTypeLimits": [],
+            "FunctionTypes": [
+              "Ethernet",
+              "FCoE"
+            ],
+            "MostRecentConfigurationChangeSource": "None",
+            "RDMASupport": [
+              "None"
+            ],
+            "UnderlyingDataSource": "DCi"
+          }
+        ],
+        "FactoryDefaultsActuationBehavior": "AtFullPower",
+        "PCAVersion": "789004-001",
+        "RedfishConfiguration": "Disabled"
+      }
+    },
+    "PartNumber": "",
+    "SKU": "562FLR-SFP+",
+    "SerialNumber": "MYI011033W",
+    "Settings": {
+      "href": "/redfish/v1/Chassis/1/NetworkAdapters/DC01D000/Settings/"
+    }
+  }
