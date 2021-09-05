@@ -4,7 +4,7 @@ import "github.com/prometheus/client_golang/prometheus"
 
 var (
 	Chasis_status = prometheus.NewDesc(
-		"ilo_chasis_status",
+		"hpilo_chasis_status",
 		"chasis status",
 		[]string{
 			"id",
@@ -20,7 +20,7 @@ var (
 		nil,
 	)
 	C_power_line_input_voltage = prometheus.NewDesc(
-		"ilo_power_line_input_voltage",
+		"hpilo_power_line_input_voltage",
 		"Power Line Input Voltage",
 		[]string{
 			"member_id",
@@ -36,8 +36,8 @@ var (
 		nil,
 	)
 	C_power_control = prometheus.NewDesc(
-		"ilo_power_control",
-		"Power Control",
+		"hpilo_power_control",
+		"Power Capacity watts",
 		[]string{
 			"member_id",
 			"power_capacity_watts",
@@ -50,7 +50,7 @@ var (
 	)
 
 	C_fans_status = prometheus.NewDesc(
-		"ilo_fans_status",
+		"hpilo_fans_status",
 		"status of fans",
 		[]string{
 			"member_id",
@@ -63,7 +63,7 @@ var (
 	)
 
 	C_temperature_status = prometheus.NewDesc(
-		"ilo_temperature_status",
+		"hpilo_temperature_status",
 		"Chassis temperature {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"member_id",
