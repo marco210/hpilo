@@ -4,7 +4,7 @@ import "github.com/prometheus/client_golang/prometheus"
 
 var (
 	Chasis_status = prometheus.NewDesc(
-		"chasis_status",
+		"ilo_chasis_status",
 		"chasis status",
 		[]string{
 			"id",
@@ -42,7 +42,22 @@ var (
 			"member_id",
 			"power_capacity_watts",
 			"power_consumed_watts",
-			"power_metrics",
+			"average_consumed_watts",
+			"max_consumed_watts",
+			"min_consumed_watts",
+		},
+		nil,
+	)
+
+	C_fans_status = prometheus.NewDesc(
+		"ilo_fans_status",
+		"status of fans",
+		[]string{
+			"member_id",
+			"name",
+			"reading",
+			"status",
+			"state",
 		},
 		nil,
 	)
@@ -51,28 +66,14 @@ var (
 		"ilo_temperature_status",
 		"Chassis temperature {0: OK, 1: Warning, 2: Critical}",
 		[]string{
+			"member_id",
+			"name",
 			"reading_celsius",
-			"memberid",
 			"sensor_number",
 			"status_health",
 			"status_state",
 			"upper_threshold_critical",
 			"upper_threshold_fatal",
-		},
-		nil,
-	)
-
-	// C_networkadapter => network adapter of the chassis
-	C_networkadapter = prometheus.NewDesc(
-		"ilo_chassis_network_adapter",
-		"Chassis network adapter {0: OK, 1: Warning, 2: Critical}",
-		[]string{
-			"description",
-			"manufacturer",
-			"model",
-			"part_number",
-			"sku",
-			"serial_number",
 		},
 		nil,
 	)
