@@ -105,7 +105,7 @@ var (
 
 	// S_network_adapter_status => system network adapter status
 	S_network_adapter_status = prometheus.NewDesc(
-		"idrac_network_adapter_status",
+		"hpilo_network_adapter_status",
 		"System Controller {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"network_adapter_manufacture",
@@ -118,7 +118,7 @@ var (
 
 	// S_ethernetinterface => system's ethernet interface
 	S_ethernetinterface = prometheus.NewDesc(
-		"idrac_system_ethernet_interface_status",
+		"hpilo_system_ethernet_interface_status",
 		"System Ethernet Interface{0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"auto_negotiation",
@@ -136,7 +136,7 @@ var (
 
 	// S_networkport => system's network port
 	S_networkport = prometheus.NewDesc(
-		"system_network_port_status",
+		"hpilo_system_network_port_status",
 		"System Network Port",
 		[]string{
 			"adapter_manufacturer",
@@ -147,6 +147,60 @@ var (
 			"number_discovered_remote_ports",
 			"physical_port_number",
 			"port_maximum_mtu",
+		},
+		nil,
+	)
+
+	//storage
+	S_storage_drive_predicted_media_life_left_percent = prometheus.NewDesc(
+		"idrac_ssd_drive_predicted_media_life_left_percent",
+		"System storage ssd drive predicted media life left percent",
+		[]string{
+			"block_size_bytes",
+			"capable_speed_gbs",
+			"capacity",
+			"description",
+			"manufacturer",
+			"mediatype",
+			"model",
+			"part_number",
+			"protocol",
+			"revision",
+			"serial_number",
+		},
+		nil,
+	)
+
+	// S_storage_drive => computer system -> storage -> drive
+	S_storage_drive = prometheus.NewDesc(
+		"hpilo_storage_drive_status",
+		"System storage drive {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"block_size_bytes",
+			"capable_speed_gbs",
+			"capacity",
+			"description",
+			"indicator_led",
+			"manufacturer",
+			"media_type",
+			"model",
+			"part_number",
+			"protocol",
+			"revision",
+			"serial_number",
+		},
+		nil,
+	)
+
+	// S_storage => systems' storage
+	S_storage = prometheus.NewDesc(
+		"hpilo_system_storage",
+		"System storage {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"description",
+			"drives_count",
+			"redundancy_count",
+			"EnclosuresCount",
 		},
 		nil,
 	)
