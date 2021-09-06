@@ -21,6 +21,11 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_ethernetinterface
 	ch <- config.S_networkport
 	ch <- config.S_network_interfaces_status
+	ch <- config.S_storage
+	ch <- config.S_storage_drive
+	ch <- config.S_storage_drive_predicted_media_life_left_percent
+	ch <- config.S_storage_volume
+
 }
 
 func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
@@ -37,6 +42,7 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		//
 		sys_collector.collectEthernetInterfaces(ch, system)
 		sys_collector.collectorNetworks(ch, system)
+		sys_collector.collectStorage(ch, system)
 	}
 }
 

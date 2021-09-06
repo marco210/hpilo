@@ -204,4 +204,19 @@ var (
 		},
 		nil,
 	)
+
+	S_storage_volume = prometheus.NewDesc(
+		"idrac_storage_volume_status",
+		"Storage volume status",
+		[]string{
+			"description",
+			"capacity",
+			"volume_type",
+			"encrypted",
+			"block_size_bytes",
+			"drives_count",
+			"associated_drives_id",
+		},
+		nil,
+	)
 )
