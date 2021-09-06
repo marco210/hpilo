@@ -15,6 +15,7 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_health
 	ch <- config.S_memory
 	ch <- config.S_processor
+	ch <- config.S_storage_array_status
 }
 
 func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
@@ -28,6 +29,7 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		sys_collector.collectSystemHealth(ch, system)
 		sys_collector.collectMemories(ch, system)
 		sys_collector.collectProcessor(ch, system)
+		sys_collector.collectStorageArrayController(ch, system)
 	}
 }
 
@@ -150,7 +152,8 @@ func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v
 	}
 }
 
-func (collector SystemCollector) collectStorageArray(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
+// /redfish/v1/Systems/1/SmartStorage/ArrayControllers/x/
+func (collector SystemCollector) collectStorageArrayController(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
 	storages, err := v.Storage()
 
 	if nil != err {
@@ -168,13 +171,31 @@ func (collector SystemCollector) collectStorageArray(ch chan<- prometheus.Metric
 			} else {
 				storage_temp1 = 2
 			}
-
+			fmt.Println(storage.ODataContext)
 			ch <- prometheus.MustNewConstMetric(
 				config.S_storage_array_status,
 				prometheus.GaugeValue,
 				storage_temp1,
-				fmt.Sprintf("%v", storage.ODataContext),
+				fmt.Sprintf("%v", storage.Description),
+				fmt.Sprintf("%v", storage.DrivesCount),
+				fmt.Sprintf("%v", storage.EnclosuresCount),
+				fmt.Sprintf("%v", storage.StorageControllersCount),
+				fmt.Sprintf("%v", storage.StorageControllers),
+				fmt.Sprintf("%v", storage.ID),
+				fmt.Sprintf("%v", storage.Name),
+				fmt.Sprintf("%v", storage.ODataID),
 			)
+
+			// storage_encloses, err := storage.Enclosures()
+			// if err != nil {
+			// 	panic(err)
+			// }
+
+			// if err == nil {
+			// 	for _, enclose := range storage_encloses {
+
+			// 	}
+			// }
 		}
 	}
 
