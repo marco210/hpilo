@@ -1,0 +1,43 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#HpeSmartStorageDiskDrive.HpeSmartStorageDiskDrive",
+    "@odata.etag": "W/\"39BF280F\"",
+    "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives/0",
+    "@odata.type": "#HpeSmartStorageDiskDrive.v2_1_0.HpeSmartStorageDiskDrive",
+    "Id": "0",
+    "BlockSizeBytes": 512,
+    "CapacityGB": 800,
+    "CapacityLogicalBlocks": 1562824368,
+    "CapacityMiB": 763097,
+    "CarrierApplicationVersion": "11",
+    "CarrierAuthenticationStatus": "OK",
+    "CurrentTemperatureCelsius": 19,
+    "Description": "HPE Smart Storage Disk Drive View",
+    "DiskDriveStatusReasons": [
+      "None"
+    ],
+    "DiskDriveUse": "Data",
+    "EncryptedDrive": false,
+    "FirmwareVersion": {
+      "Current": {
+        "VersionString": "HPD2"
+      }
+    },
+    "InterfaceSpeedMbps": 12000,
+    "InterfaceType": "SAS",
+    "LegacyBootPriority": "None",
+    "Location": "1I:1:1",
+    "LocationFormat": "ControllerPort:Box:Bay",
+    "MaximumTemperatureCelsius": 25,
+    "MediaType": "SSD",
+    "Model": "VO000800JWZJP",
+    "Name": "HpeSmartStorageDiskDrive",
+    "PowerOnHours": 7463,
+    "SSDEnduranceUtilizationPercentage": 0,
+    "SerialNumber": "S5KSNE0N707542",
+    "Status": {
+      "Health": "OK",
+      "State": "Enabled"
+    },
+    "UncorrectedReadErrors": 0,
+    "UncorrectedWriteErrors": 0
+  }

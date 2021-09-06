@@ -1,0 +1,59 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#HpeSmartStorageArrayController.HpeSmartStorageArrayController",
+    "@odata.etag": "W/\"51FFAED9\"",
+    "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0",
+    "@odata.type": "#HpeSmartStorageArrayController.v2_2_0.HpeSmartStorageArrayController",
+    "Id": "0",
+    "AdapterType": "SmartArray",
+    "BackupPowerSourceStatus": "NotPresent",
+    "ControllerBoard": {
+      "Status": {
+        "Health": "OK"
+      }
+    },
+    "ControllerPartNumber": "871041-001",
+    "CurrentOperatingMode": "Mixed",
+    "Description": "HPE Smart Storage Array Controller View",
+    "DriveWriteCache": "Disabled",
+    "EncryptionCryptoOfficerPasswordSet": false,
+    "EncryptionCspTestPassed": true,
+    "EncryptionEnabled": false,
+    "EncryptionFwLocked": false,
+    "EncryptionHasLockedVolumesMissingBootPassword": false,
+    "EncryptionMixedVolumesEnabled": false,
+    "EncryptionSelfTestPassed": true,
+    "EncryptionStandaloneModeEnabled": false,
+    "ExternalPortCount": 0,
+    "FirmwareVersion": {
+      "Current": {
+        "VersionString": "3.00"
+      }
+    },
+    "HardwareRevision": "A",
+    "InternalPortCount": 4,
+    "Links": {
+      "LogicalDrives": {
+        "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives"
+      },
+      "StorageEnclosures": {
+        "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures"
+      },
+      "PhysicalDrives": {
+        "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives"
+      },
+      "UnconfiguredDrives": {
+        "@odata.id": "/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/UnconfiguredDrives"
+      }
+    },
+    "Location": "Slot 0",
+    "LocationFormat": "PCISlot",
+    "Model": "HPE Smart Array P816i-a SR Gen10",
+    "Name": "Hpe Smart Storage Array Controller",
+    "ReadCachePercent": 0,
+    "SerialNumber": "PWDRB0ERHDV19X ",
+    "Status": {
+      "Health": "OK",
+      "State": "Enabled"
+    },
+    "WriteCacheWithoutBackupPowerEnabled": false
+  }

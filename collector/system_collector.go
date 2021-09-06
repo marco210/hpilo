@@ -14,9 +14,10 @@ type SystemCollector struct{}
 func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_health
 	ch <- config.S_memory
+	ch <- config.S_processor
 }
 
-func (collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
+func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 	metric := config.GOFISH.Service
 	systems, sysErr := metric.Systems() //Systems get the system instances from the service
 
@@ -24,12 +25,15 @@ func (collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		panic(sysErr)
 	}
 	for _, system := range systems {
-		collector.collectSystemHealth(ch, system)
-		collector.collectMemories(ch, system)
+		sys_collector.collectSystemHealth(ch, system)
+		sys_collector.collectMemories(ch, system)
+		sys_collector.collectProcessor(ch, system)
 	}
 }
 
 func (collector SystemCollector) collectSystemHealth(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
+	fmt.Println("system connected")
+
 	system_temp := string(v.Status.Health)
 	system_temp1 := 0.0
 	if system_temp == "OK" {
@@ -59,6 +63,8 @@ func (collector SystemCollector) collectSystemHealth(ch chan<- prometheus.Metric
 }
 
 func (collector SystemCollector) collectMemories(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
+	fmt.Println("memory connected")
+
 	memories, err := v.Memory()
 
 	if nil != err {
@@ -96,6 +102,78 @@ func (collector SystemCollector) collectMemories(ch chan<- prometheus.Metric, v 
 				fmt.Sprintf("%v", memory.Name),
 				fmt.Sprintf("%v", memory.Status.Health),
 				fmt.Sprintf("%v", memory.Status.State),
+			)
+		}
+	}
+
+}
+
+func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
+
+	processors, err := v.Processors()
+
+	if nil != err {
+		panic(err)
+	}
+
+	if err == nil {
+		for _, processor := range processors {
+			processor_temp := string(processor.Status.Health)
+			processor_temp1 := 0.0
+			if processor_temp == "OK" {
+				processor_temp1 = 0
+			} else if processor_temp == "WARNING" {
+				processor_temp1 = 1
+			} else {
+				processor_temp1 = 2
+			}
+
+			ch <- prometheus.MustNewConstMetric(
+				config.S_processor,
+				prometheus.GaugeValue,
+				processor_temp1,
+				fmt.Sprintf("%v", processor.ID),
+				fmt.Sprintf("%v", processor.InstructionSet),
+				fmt.Sprintf("%v", processor.Manufacturer),
+				fmt.Sprintf("%v", processor.MaxSpeedMHz),
+				fmt.Sprintf("%v", processor.Model),
+				fmt.Sprintf("%v", processor.ProcessorArchitecture),
+				fmt.Sprintf("%v", processor.ProcessorType),
+				fmt.Sprintf("%v", processor.Status.Health),
+				fmt.Sprintf("%v", processor.Status.State),
+				fmt.Sprintf("%v", processor.TotalCores),
+				fmt.Sprintf("%v", processor.TotalEnabledCores),
+				fmt.Sprintf("%v", processor.TotalThreads),
+			)
+		}
+
+	}
+}
+
+func (collector SystemCollector) collectStorageArray(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
+	storages, err := v.Storage()
+
+	if nil != err {
+		panic(err)
+	}
+
+	if err == nil {
+		for _, storage := range storages {
+			storage_temp := string(storage.Status.Health)
+			storage_temp1 := 0.0
+			if storage_temp == "OK" {
+				storage_temp1 = 0
+			} else if storage_temp == "WARNING" {
+				storage_temp1 = 1
+			} else {
+				storage_temp1 = 2
+			}
+
+			ch <- prometheus.MustNewConstMetric(
+				config.S_storage_array_status,
+				prometheus.GaugeValue,
+				storage_temp1,
+				fmt.Sprintf("%v", storage.ODataContext),
 			)
 		}
 	}

@@ -51,9 +51,9 @@ func main() {
 	// Listen all interfaces at port 9000
 	const IP_ADDRESS = ":" + PORT
 
-	// system := collector.SystemCollector{}
-	// fmt.Printf("%v", system)
-	// prometheus.Register(system)
+	system := collector.SystemCollector{}
+	fmt.Printf("%v", system)
+	prometheus.Register(system)
 
 	chassis := collector.Chassis{}
 	prometheus.Register(chassis)
