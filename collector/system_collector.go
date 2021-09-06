@@ -15,7 +15,10 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_health
 	ch <- config.S_memory
 	ch <- config.S_processor
-	ch <- config.S_storage_array_status
+	ch <- config.S_network_adapter_status
+	ch <- config.S_ethernetinterface
+	ch <- config.S_networkport
+	ch <- config.S_network_interfaces_status
 }
 
 func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
@@ -29,7 +32,9 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		sys_collector.collectSystemHealth(ch, system)
 		sys_collector.collectMemories(ch, system)
 		sys_collector.collectProcessor(ch, system)
-		sys_collector.collectStorageArrayController(ch, system)
+		//
+		sys_collector.collectEthernetInterfaces(ch, system)
+		sys_collector.collectorNetworks(ch, system)
 	}
 }
 
@@ -152,51 +157,131 @@ func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v
 	}
 }
 
-// /redfish/v1/Systems/1/SmartStorage/ArrayControllers/x/
-func (collector SystemCollector) collectStorageArrayController(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
-	storages, err := v.Storage()
+func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
+	ethernetInterfaces, ethernetErr := system.EthernetInterfaces()
+	if nil != ethernetErr {
+		panic(ethernetErr)
+	}
+
+	if 0 != len(ethernetInterfaces) {
+		for _, ethernetInterface := range ethernetInterfaces {
+			status := config.State_dict[string(ethernetInterface.Status.Health)]
+			ch <- prometheus.MustNewConstMetric(config.S_ethernetinterface,
+				prometheus.GaugeValue,
+				float64(status),
+				fmt.Sprintf("%v", ethernetInterface.AutoNeg),
+				ethernetInterface.Description,
+				fmt.Sprintf("%v", ethernetInterface.EthernetInterfaceType),
+				ethernetInterface.FQDN,
+				fmt.Sprintf("%v", ethernetInterface.FullDuplex),
+				ethernetInterface.HostName,
+				ethernetInterface.MACAddress,
+				fmt.Sprintf("%v", ethernetInterface.MTUSize),
+				fmt.Sprintf("%v", ethernetInterface.SpeedMbps),
+			)
+		}
+	}
+}
+
+func (collector SystemCollector) collectProcessors(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
+	processors, proErr := system.Processors()
+
+	if nil != proErr {
+		panic(proErr)
+	}
+
+	for _, processor := range processors {
+		status := config.State_dict[string(processor.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_processor,
+			prometheus.GaugeValue,
+			float64(status),
+			processor.Actions,
+			processor.Description,
+			processor.Manufacturer,
+			fmt.Sprintf("%v", processor.MaxSpeedMHz),
+			fmt.Sprintf("%v", processor.MaxTDPWatts),
+			processor.Model,
+			fmt.Sprintf("%v", processor.ProcessorType),
+			processor.Socket,
+			processor.SubProcessors,
+			fmt.Sprintf("%v", processor.TDPWatts),
+			fmt.Sprintf("%v", processor.TotalCores),
+			fmt.Sprintf("%v", processor.TotalEnabledCores),
+			fmt.Sprintf("%v", processor.TotalThreads),
+			processor.UUID,
+		)
+	}
+}
+
+func (collector SystemCollector) collectorNetworks(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
+	interfaces, err := system.NetworkInterfaces()
 
 	if nil != err {
 		panic(err)
 	}
 
-	if err == nil {
-		for _, storage := range storages {
-			storage_temp := string(storage.Status.Health)
-			storage_temp1 := 0.0
-			if storage_temp == "OK" {
-				storage_temp1 = 0
-			} else if storage_temp == "WARNING" {
-				storage_temp1 = 1
-			} else {
-				storage_temp1 = 2
-			}
-			fmt.Println(storage.ODataContext)
-			ch <- prometheus.MustNewConstMetric(
-				config.S_storage_array_status,
-				prometheus.GaugeValue,
-				storage_temp1,
-				fmt.Sprintf("%v", storage.Description),
-				fmt.Sprintf("%v", storage.DrivesCount),
-				fmt.Sprintf("%v", storage.EnclosuresCount),
-				fmt.Sprintf("%v", storage.StorageControllersCount),
-				fmt.Sprintf("%v", storage.StorageControllers),
-				fmt.Sprintf("%v", storage.ID),
-				fmt.Sprintf("%v", storage.Name),
-				fmt.Sprintf("%v", storage.ODataID),
-			)
+	if 0 != len(interfaces) {
+		collector.makeNetworkPortMetricFromNetworkInterfaces(ch, interfaces)
+	}
+}
 
-			// storage_encloses, err := storage.Enclosures()
-			// if err != nil {
-			// 	panic(err)
-			// }
+func (collector SystemCollector) makeNetworkPortMetricFromNetworkInterfaces(ch chan<- prometheus.Metric,
+	interfaces []*redfish.NetworkInterface) {
+	for _, netInterface := range interfaces {
+		adapter, err := netInterface.NetworkAdapter()
 
-			// if err == nil {
-			// 	for _, enclose := range storage_encloses {
+		if nil != err {
+			panic(err)
+		}
 
-			// 	}
-			// }
+		if nil != adapter {
+			collector.collectNetworkPortMetricFromNetworkAdapter(ch, adapter)
+			collector.collectNetworkAdapterStatus(ch, adapter)
 		}
 	}
+}
 
+func (collector SystemCollector) collectNetworkPortMetricFromNetworkAdapter(ch chan<- prometheus.Metric,
+	adapter *redfish.NetworkAdapter) {
+	networkPorts, err := adapter.NetworkPorts()
+	netState := map[string]float64{"Up": 0.0, "Down": 1.0}
+
+	if nil != err {
+		panic(err)
+	}
+
+	for _, networkPort := range networkPorts {
+		stateString := fmt.Sprintf("%v", networkPort.LinkStatus)
+		status := netState[stateString]
+		ch <- prometheus.MustNewConstMetric(config.S_networkport,
+			prometheus.GaugeValue,
+			status,
+			adapter.Manufacturer,
+			fmt.Sprintf("%v", networkPort.LinkStatus),
+			fmt.Sprintf("%v", networkPort.CurrentLinkSpeedMbps),
+			networkPort.Description,
+			fmt.Sprintf("%v", networkPort.MaxFrameSize),
+			fmt.Sprintf("%v", networkPort.NumberDiscoveredRemotePorts),
+			networkPort.PhysicalPortNumber,
+			fmt.Sprintf("%v", networkPort.PortMaximumMTU),
+		)
+	}
+}
+
+func (collector SystemCollector) collectNetworkAdapterStatus(ch chan<- prometheus.Metric,
+	adapter *redfish.NetworkAdapter) {
+	controllers := adapter.Controllers
+
+	if 0 != len(controllers) {
+		for _, control := range controllers {
+			ch <- prometheus.MustNewConstMetric(config.S_network_adapter_status,
+				prometheus.GaugeValue,
+				float64(0),
+				adapter.Manufacturer,
+				control.FirmwarePackageVersion,
+				fmt.Sprintf("%v", control.NetworkDeviceFunctionsCount),
+				fmt.Sprintf("%v", control.NetworkPortsCount),
+			)
+		}
+	}
 }
