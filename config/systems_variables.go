@@ -206,7 +206,7 @@ var (
 	)
 
 	S_storage_volume = prometheus.NewDesc(
-		"idrac_storage_volume_status",
+		"hpilo_storage_volume_status",
 		"Storage volume status",
 		[]string{
 			"description",

@@ -191,35 +191,35 @@ func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.
 	}
 }
 
-func (collector SystemCollector) collectProcessors(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
-	processors, proErr := system.Processors()
+// func (collector SystemCollector) collectProcessors(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
+// 	processors, proErr := system.Processors()
 
-	if nil != proErr {
-		panic(proErr)
-	}
+// 	if nil != proErr {
+// 		panic(proErr)
+// 	}
 
-	for _, processor := range processors {
-		status := config.State_dict[string(processor.Status.Health)]
-		ch <- prometheus.MustNewConstMetric(config.S_processor,
-			prometheus.GaugeValue,
-			float64(status),
-			processor.Actions,
-			processor.Description,
-			processor.Manufacturer,
-			fmt.Sprintf("%v", processor.MaxSpeedMHz),
-			fmt.Sprintf("%v", processor.MaxTDPWatts),
-			processor.Model,
-			fmt.Sprintf("%v", processor.ProcessorType),
-			processor.Socket,
-			processor.SubProcessors,
-			fmt.Sprintf("%v", processor.TDPWatts),
-			fmt.Sprintf("%v", processor.TotalCores),
-			fmt.Sprintf("%v", processor.TotalEnabledCores),
-			fmt.Sprintf("%v", processor.TotalThreads),
-			processor.UUID,
-		)
-	}
-}
+// 	for _, processor := range processors {
+// 		status := config.State_dict[string(processor.Status.Health)]
+// 		ch <- prometheus.MustNewConstMetric(config.S_processor,
+// 			prometheus.GaugeValue,
+// 			float64(status),
+// 			processor.Actions,
+// 			processor.Description,
+// 			processor.Manufacturer,
+// 			fmt.Sprintf("%v", processor.MaxSpeedMHz),
+// 			fmt.Sprintf("%v", processor.MaxTDPWatts),
+// 			processor.Model,
+// 			fmt.Sprintf("%v", processor.ProcessorType),
+// 			processor.Socket,
+// 			processor.SubProcessors,
+// 			fmt.Sprintf("%v", processor.TDPWatts),
+// 			fmt.Sprintf("%v", processor.TotalCores),
+// 			fmt.Sprintf("%v", processor.TotalEnabledCores),
+// 			fmt.Sprintf("%v", processor.TotalThreads),
+// 			processor.UUID,
+// 		)
+// 	}
+// }
 
 func (collector SystemCollector) collectorNetworks(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
 	interfaces, err := system.NetworkInterfaces()
@@ -304,15 +304,16 @@ func (collector SystemCollector) collectStorage(ch chan<- prometheus.Metric, sys
 
 	if 0 != len(storages) {
 		for _, storage := range storages {
-			status := config.State_dict[string(storage.Status.Health)]
-			ch <- prometheus.MustNewConstMetric(config.S_storage,
-				prometheus.GaugeValue,
-				float64(status),
-				storage.Description,
-				fmt.Sprintf("%v", storage.DrivesCount),
-				fmt.Sprintf("%v", storage.RedundancyCount),
-				fmt.Sprintf("%v", storage.EnclosuresCount),
-			)
+			// status := config.State_dict[string(storage.Status.Health)]
+			// ch <- prometheus.MustNewConstMetric(config.S_storage,
+			// 	prometheus.GaugeValue,
+			// 	float64(status),
+			// 	storage.Description,
+			// 	fmt.Sprintf("%v", storage.DrivesCount),
+			// 	fmt.Sprintf("%v", storage.RedundancyCount),
+			// 	fmt.Sprintf("%v", storage.EnclosuresCount),
+			// )
+			fmt.Println(storage)
 
 			collector.collectDrives(ch, storage)
 		}
@@ -341,27 +342,28 @@ func (collector SystemCollector) collectDrives(ch chan<- prometheus.Metric, stor
 	}
 
 	for _, drive := range drives {
-		status := config.State_dict[string(drive.Status.Health)]
-		ch <- prometheus.MustNewConstMetric(config.S_storage_drive,
-			prometheus.GaugeValue,
-			float64(status),
-			fmt.Sprintf("%v", drive.BlockSizeBytes),
-			fmt.Sprintf("%v", drive.CapableSpeedGbs),
-			collector.convertCapacity(float64(drive.CapacityBytes)),
-			drive.Description,
-			fmt.Sprintf("%v", drive.IndicatorLED),
-			drive.Manufacturer,
-			fmt.Sprintf("%v", drive.MediaType),
-			drive.Model,
-			drive.PartNumber,
-			fmt.Sprintf("%v", drive.Protocol),
-			drive.Revision,
-			drive.SerialNumber,
-		)
+		// status := config.State_dict[string(drive.Status.Health)]
+		// ch <- prometheus.MustNewConstMetric(config.S_storage_drive,
+		// 	prometheus.GaugeValue,
+		// 	float64(status),
+		// 	fmt.Sprintf("%v", drive.BlockSizeBytes),
+		// 	fmt.Sprintf("%v", drive.CapableSpeedGbs),
+		// 	collector.convertCapacity(float64(drive.CapacityBytes)),
+		// 	drive.Description,
+		// 	fmt.Sprintf("%v", drive.IndicatorLED),
+		// 	drive.Manufacturer,
+		// 	fmt.Sprintf("%v", drive.MediaType),
+		// 	drive.Model,
+		// 	drive.PartNumber,
+		// 	fmt.Sprintf("%v", drive.Protocol),
+		// 	drive.Revision,
+		// 	drive.SerialNumber,
+		// )
 
-		if "SSD" == fmt.Sprintf("%v", drive.MediaType) {
-			collector.collectSSDDrives(ch, drive)
-		}
+		// if "SSD" == fmt.Sprintf("%v", drive.MediaType) {
+		// 	collector.collectSSDDrives(ch, drive)
+		// }
+		fmt.Println(drive)
 	}
 }
 
