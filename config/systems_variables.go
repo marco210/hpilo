@@ -69,6 +69,53 @@ var (
 		nil,
 	)
 
+	// S_networkport => system's network port
+	S_networkport = prometheus.NewDesc(
+		"hpilo_system_network_port_status",
+		"System Network Port",
+		[]string{
+			"adapter_manufacturer",
+			"link_status",
+			"current_link_speed_mbps",
+			"description",
+			"max_frame_size",
+			"number_discovered_remote_ports",
+			"physical_port_number",
+			"port_maximum_mtu",
+		},
+		nil,
+	)
+
+	// S_network_adapter_status => system network adapter status
+	S_network_adapter_status = prometheus.NewDesc(
+		"hpilo_network_adapter_status",
+		"System Controller {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"network_adapter_manufacture",
+			"firmware_package_version",
+			"network_device_functions_count",
+			"network_ports_count",
+		},
+		nil,
+	)
+	// S_ethernetinterface => system's ethernet interface
+	S_ethernetinterface = prometheus.NewDesc(
+		"hpilo_system_ethernet_interface_status",
+		"System Ethernet Interface{0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"auto_negotiation",
+			"description",
+			"ethernet_interface_type",
+			"fqdn",
+			"full_duplex",
+			"host_name",
+			"mac_address",
+			"mtu_size",
+			"speed_Mbps",
+		},
+		nil,
+	)
+
 	// S_storage => systems' storage
 	S_storage = prometheus.NewDesc(
 		"hpiloc_system_storage",
@@ -133,53 +180,6 @@ var (
 			"block_size_bytes",
 			"drives_count",
 			"associated_drives_id",
-		},
-		nil,
-	)
-
-	// S_networkport => system's network port
-	S_networkport = prometheus.NewDesc(
-		"system_network_port_status",
-		"System Network Port",
-		[]string{
-			"adapter_manufacturer",
-			"link_status",
-			"current_link_speed_mbps",
-			"description",
-			"max_frame_size",
-			"number_discovered_remote_ports",
-			"physical_port_number",
-			"port_maximum_mtu",
-		},
-		nil,
-	)
-
-	// S_network_adapter_status => system network adapter status
-	S_network_adapter_status = prometheus.NewDesc(
-		"hpilo_network_adapter_status",
-		"System Controller {0: OK, 1: Warning, 2: Critical}",
-		[]string{
-			"network_adapter_manufacture",
-			"firmware_package_version",
-			"network_device_functions_count",
-			"network_ports_count",
-		},
-		nil,
-	)
-	// S_ethernetinterface => system's ethernet interface
-	S_ethernetinterface = prometheus.NewDesc(
-		"hpilo_system_ethernet_interface_status",
-		"System Ethernet Interface{0: OK, 1: Warning, 2: Critical}",
-		[]string{
-			"auto_negotiation",
-			"description",
-			"ethernet_interface_type",
-			"fqdn",
-			"full_duplex",
-			"host_name",
-			"mac_address",
-			"mtu_size",
-			"speed_Mbps",
 		},
 		nil,
 	)

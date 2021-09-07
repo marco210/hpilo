@@ -194,105 +194,6 @@ func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v
 // 		)
 // 	}
 // }
-func (collector SystemCollector) collectStorage(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
-	storages, storageErr := system.Storage()
-
-	if nil != storageErr {
-		panic(storageErr)
-	}
-
-	if 0 != len(storages) {
-		for _, storage := range storages {
-			status := config.State_dict[string(storage.Status.Health)]
-			ch <- prometheus.MustNewConstMetric(config.S_storage,
-				prometheus.GaugeValue,
-				float64(status),
-				storage.Description,
-				fmt.Sprintf("%v", storage.DrivesCount),
-				fmt.Sprintf("%v", storage.RedundancyCount),
-				fmt.Sprintf("%v", storage.EnclosuresCount),
-			)
-
-			collector.collectDrives(ch, storage)
-		}
-	}
-}
-
-func (collector SystemCollector) associatedDriveIds(volume *redfish.Volume) []string {
-	drives, _ := volume.Drives()
-	driveId := make([]string, 0)
-
-	if 0 != len(drives) {
-		for _, drive := range drives {
-			words := strings.Split(drive.Description, " ")
-			driveId = append(driveId, words[len(words)-1])
-		}
-	}
-
-	return driveId
-}
-
-func (collector SystemCollector) collectDrives(ch chan<- prometheus.Metric, storage *redfish.Storage) {
-	drives, driveErr := storage.Drives()
-
-	if nil != driveErr {
-		panic(driveErr)
-	}
-
-	for _, drive := range drives {
-		status := config.State_dict[string(drive.Status.Health)]
-		ch <- prometheus.MustNewConstMetric(config.S_storage_drive,
-			prometheus.GaugeValue,
-			float64(status),
-			fmt.Sprintf("%v", drive.BlockSizeBytes),
-			fmt.Sprintf("%v", drive.CapableSpeedGbs),
-			collector.convertCapacity(float64(drive.CapacityBytes)),
-			drive.Description,
-			fmt.Sprintf("%v", drive.IndicatorLED),
-			drive.Manufacturer,
-			fmt.Sprintf("%v", drive.MediaType),
-			drive.Model,
-			drive.PartNumber,
-			fmt.Sprintf("%v", drive.Protocol),
-			drive.Revision,
-			drive.SerialNumber,
-		)
-
-		if "SSD" == fmt.Sprintf("%v", drive.MediaType) {
-			collector.collectSSDDrives(ch, drive)
-		}
-	}
-}
-
-func (collector SystemCollector) collectSSDDrives(ch chan<- prometheus.Metric, drive *redfish.Drive) {
-	ch <- prometheus.MustNewConstMetric(config.S_storage_drive_predicted_media_life_left_percent,
-		prometheus.GaugeValue,
-		float64(drive.PredictedMediaLifeLeftPercent),
-		fmt.Sprintf("%v", drive.BlockSizeBytes),
-		fmt.Sprintf("%v", drive.CapableSpeedGbs),
-		collector.convertCapacity(float64(drive.CapacityBytes)),
-		drive.Description,
-		drive.Manufacturer,
-		fmt.Sprintf("%v", drive.MediaType),
-		drive.Model,
-		drive.PartNumber,
-		fmt.Sprintf("%v", drive.Protocol),
-		drive.Revision,
-		drive.SerialNumber,
-	)
-}
-
-func (collector SystemCollector) convertCapacity(num float64) string {
-	units := []string{"TB", "GB", "MB", "KB", "B"}
-	idx := len(units) - 1
-
-	for idx > -1 && num >= 1000 {
-		idx -= 1
-		num = num / 1000
-	}
-
-	return fmt.Sprintf("%v", math.RoundToEven(num)) + units[idx]
-}
 
 func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
 	ethernetInterfaces, ethernetErr := system.EthernetInterfaces()
@@ -391,4 +292,109 @@ func (collector SystemCollector) collectNetworkAdapterStatus(ch chan<- prometheu
 			)
 		}
 	}
+}
+
+//storage
+
+func (collector SystemCollector) collectStorage(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
+	storages, storageErr := system.Storage()
+
+	if nil != storageErr {
+		panic(storageErr)
+	}
+
+	if 0 != len(storages) {
+		for _, storage := range storages {
+			fmt.Println(storage)
+			status := config.State_dict[string(storage.Status.Health)]
+			ch <- prometheus.MustNewConstMetric(config.S_storage,
+				prometheus.GaugeValue,
+				float64(status),
+				storage.Description,
+				fmt.Sprintf("%v", storage.DrivesCount),
+				fmt.Sprintf("%v", storage.RedundancyCount),
+				fmt.Sprintf("%v", storage.EnclosuresCount),
+			)
+
+			collector.collectDrives(ch, storage)
+		}
+	}
+}
+
+func (collector SystemCollector) associatedDriveIds(volume *redfish.Volume) []string {
+	drives, _ := volume.Drives()
+	driveId := make([]string, 0)
+
+	if 0 != len(drives) {
+		for _, drive := range drives {
+			fmt.Println(drive)
+			words := strings.Split(drive.Description, " ")
+			driveId = append(driveId, words[len(words)-1])
+		}
+	}
+
+	return driveId
+}
+
+func (collector SystemCollector) collectDrives(ch chan<- prometheus.Metric, storage *redfish.Storage) {
+	drives, driveErr := storage.Drives()
+
+	if nil != driveErr {
+		panic(driveErr)
+	}
+
+	for _, drive := range drives {
+		fmt.Println(drive)
+		status := config.State_dict[string(drive.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_storage_drive,
+			prometheus.GaugeValue,
+			float64(status),
+			fmt.Sprintf("%v", drive.BlockSizeBytes),
+			fmt.Sprintf("%v", drive.CapableSpeedGbs),
+			collector.convertCapacity(float64(drive.CapacityBytes)),
+			drive.Description,
+			fmt.Sprintf("%v", drive.IndicatorLED),
+			drive.Manufacturer,
+			fmt.Sprintf("%v", drive.MediaType),
+			drive.Model,
+			drive.PartNumber,
+			fmt.Sprintf("%v", drive.Protocol),
+			drive.Revision,
+			drive.SerialNumber,
+		)
+
+		if "SSD" == fmt.Sprintf("%v", drive.MediaType) {
+			collector.collectSSDDrives(ch, drive)
+		}
+	}
+}
+
+func (collector SystemCollector) collectSSDDrives(ch chan<- prometheus.Metric, drive *redfish.Drive) {
+	ch <- prometheus.MustNewConstMetric(config.S_storage_drive_predicted_media_life_left_percent,
+		prometheus.GaugeValue,
+		float64(drive.PredictedMediaLifeLeftPercent),
+		fmt.Sprintf("%v", drive.BlockSizeBytes),
+		fmt.Sprintf("%v", drive.CapableSpeedGbs),
+		collector.convertCapacity(float64(drive.CapacityBytes)),
+		drive.Description,
+		drive.Manufacturer,
+		fmt.Sprintf("%v", drive.MediaType),
+		drive.Model,
+		drive.PartNumber,
+		fmt.Sprintf("%v", drive.Protocol),
+		drive.Revision,
+		drive.SerialNumber,
+	)
+}
+
+func (collector SystemCollector) convertCapacity(num float64) string {
+	units := []string{"TB", "GB", "MB", "KB", "B"}
+	idx := len(units) - 1
+
+	for idx > -1 && num >= 1000 {
+		idx -= 1
+		num = num / 1000
+	}
+
+	return fmt.Sprintf("%v", math.RoundToEven(num)) + units[idx]
 }
