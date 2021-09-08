@@ -39,6 +39,7 @@ type ArrayControllers struct {
 	DriveWriteCache                     string                 `json:"drivewritecache"`
 	ExternalPortCount                   int                    `json:"externalportcount"`
 	FirmwareVersion                     FirmwareVersion        `json:"firmwareversion"`
+	HardwareRevision                    string                 `json:"hardwarerevision"`
 	InternalPortCount                   int                    `json:"internalportcount"`
 	Links                               Link_smart_storage_arr `json:"links"`
 	Location                            string                 `json:"location"`
