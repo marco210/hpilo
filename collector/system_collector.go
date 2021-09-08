@@ -324,6 +324,7 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 			float64(status),
 			fmt.Sprintf("%v", detail.Id),
 			fmt.Sprintf("%v", detail.BlockSizeBytes),
+			fmt.Sprintf("%v", detail.CapacityGB),
 			fmt.Sprintf("%v", detail.CapacityLogicalBlocks),
 			fmt.Sprintf("%v", detail.CapacityMiB),
 			fmt.Sprintf("%v", detail.CarrierAuthenticationStatus),

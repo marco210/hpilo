@@ -117,7 +117,7 @@ var (
 	)
 
 	// S_storage => systems' storage
-	S_storage_physical_drive = prometheus.NewDesc(
+	S_storage_physical_drive_status = prometheus.NewDesc(
 		"hpiloc_system_physic_drive_status",
 		"System storage physic_drive {0: OK, 1: Warning, 2: Critical}",
 		[]string{

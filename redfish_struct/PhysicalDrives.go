@@ -16,7 +16,7 @@ type PhysicalDrives struct {
 	CapacityMiB                       int             `json:"capacitymib"`
 	CarrierApplicationVersion         string          `json:"carrierapplicationversion"`
 	CarrierAuthenticationStatus       string          `json:"carrierauthenticationstatus"`
-	CurrentTemperatureCelsius         string          `json:"currenttemperaturecelsius"`
+	CurrentTemperatureCelsius         int             `json:"currenttemperaturecelsius"`
 	Description                       string          `json:"description"`
 	DiskDriveStatusReasons            []string        `json:"diskdriveStatusreasons"`
 	DiskDriveUse                      string          `json:"diskdriveuse"`
@@ -31,7 +31,7 @@ type PhysicalDrives struct {
 	MediaType                         string          `json:"mediatype"`
 	Model                             string          `json:"model"`
 	Name                              string          `json:"name"`
-	PowerOnHours                      string          `json:"poweronhours"`
+	PowerOnHours                      int             `json:"poweronhours"`
 	SSDEnduranceUtilizationPercentage int             `json:"ssdenduranceutilizationpercentage"`
 	SerialNumber                      string          `json:"serialnumber"`
 	Status                            Status          `json:"status"`
