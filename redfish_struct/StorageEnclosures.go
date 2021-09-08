@@ -1,5 +1,11 @@
 package redfishstruct
 
+import (
+	"encoding/json"
+	"hpilo_exporter/config"
+	"io/ioutil"
+)
+
 type StorageEnclosures struct {
 	ODataID         string          `json:"@odata.id"`
 	ODataType       string          `json:"@odata.type"`
@@ -13,4 +19,17 @@ type StorageEnclosures struct {
 	Name            string          `json:"name"`
 	SerialNumber    string          `json:"serialnumber"`
 	Status          Status          `json:"status"`
+}
+
+func (storageEnclosures *StorageEnclosures) UnmarshalJson(str string) (error, *StorageEnclosures) {
+	t, _ := config.GOFISH.Get(str)
+	bodyBytes, _ := ioutil.ReadAll(t.Body)
+
+	var temp StorageEnclosures
+
+	err := json.Unmarshal(bodyBytes, &temp)
+	if err != nil {
+		panic(err)
+	}
+	return nil, &temp
 }

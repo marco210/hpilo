@@ -1,5 +1,11 @@
 package redfishstruct
 
+import (
+	"encoding/json"
+	"hpilo_exporter/config"
+	"io/ioutil"
+)
+
 type Status struct {
 	Health string `json:"health"`
 	State  string `json:"state"`
@@ -22,4 +28,17 @@ type SmartStorage struct {
 	Links        Link_smart_storage `json:"links"`
 	Name         string             `json:"name"`
 	Status       Status             `json:"status"`
+}
+
+func (smartStorage *SmartStorage) UnmarshalJson(str string) (error, *SmartStorage) {
+	t, _ := config.GOFISH.Get(str)
+	bodyBytes, _ := ioutil.ReadAll(t.Body)
+
+	var temp SmartStorage
+
+	err := json.Unmarshal(bodyBytes, &temp)
+	if err != nil {
+		panic(err)
+	}
+	return nil, &temp
 }

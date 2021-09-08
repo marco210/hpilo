@@ -117,69 +117,29 @@ var (
 	)
 
 	// S_storage => systems' storage
-	S_storage = prometheus.NewDesc(
-		"hpiloc_system_storage",
-		"System storage {0: OK, 1: Warning, 2: Critical}",
+	S_storage_physical_drive = prometheus.NewDesc(
+		"hpiloc_system_physic_drive_status",
+		"System storage physic_drive {0: OK, 1: Warning, 2: Critical}",
 		[]string{
+			"id",
+			"block_Size_bytes",
+			"capicity_gb",
+			"capacity_logical_blocks",
+			"capacity_MiB",
+			"carrier_authentication_status",
+			"current_temperature_celsius",
 			"description",
-			"drives_count",
-			"redundancy_count",
-			"EnclosuresCount",
-		},
-		nil,
-	)
-
-	// S_storage_drive => computer system -> storage -> drive
-	S_storage_drive = prometheus.NewDesc(
-		"hpilo_storage_drive_status",
-		"System storage drive {0: OK, 1: Warning, 2: Critical}",
-		[]string{
-			"block_size_bytes",
-			"capable_speed_gbs",
-			"capacity",
-			"description",
-			"indicator_led",
-			"manufacturer",
+			"disk_drive_use",
+			"interface_speedMbps",
+			"interface_type",
+			"maximum_temperature_celsius",
 			"media_type",
 			"model",
-			"part_number",
-			"protocol",
-			"revision",
+			"name",
+			"power_on_hours",
 			"serial_number",
-		},
-		nil,
-	)
-
-	S_storage_drive_predicted_media_life_left_percent = prometheus.NewDesc(
-		"hpilo_ssd_drive_predicted_media_life_left_percent",
-		"System storage ssd drive predicted media life left percent",
-		[]string{
-			"block_size_bytes",
-			"capable_speed_gbs",
-			"capacity",
-			"description",
-			"manufacturer",
-			"mediatype",
-			"model",
-			"part_number",
-			"protocol",
-			"revision",
-			"serial_number",
-		},
-		nil,
-	)
-
-	S_storage_volume = prometheus.NewDesc(
-		"hpilo_storage_volume_status",
-		"Storage volume status",
-		[]string{
-			"description",
-			"capacity",
-			"volume_type",
-			"encrypted",
-			"block_size_bytes",
-			"drives_count",
-			"associated_drives_id",
+			"status_health",
+			"status_state",
 		},
 		nil,
 	)

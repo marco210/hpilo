@@ -3,6 +3,7 @@ package collector
 import (
 	"fmt"
 	"hpilo_exporter/config"
+	redfishstruct "hpilo_exporter/redfish_struct"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stmcginnis/gofish/redfish"
@@ -35,7 +36,9 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		//
 		sys_collector.collectEthernetInterfaces(ch, system)
 		sys_collector.collectorNetworks(ch, system)
+
 	}
+	sys_collector.collectPhysicalDriveStatus(ch, &redfishstruct.PhysicalDrives{})
 }
 
 func (collector SystemCollector) collectSystemHealth(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
@@ -287,3 +290,58 @@ func (collector SystemCollector) collectNetworkAdapterStatus(ch chan<- prometheu
 }
 
 //storage
+// func (collector SystemCollector) collectAllPhysicalDrive(ch chan<- prometheus.Metric,
+// 	pd *redfishstruct.AllPhysicalDrives) {
+// 	err, physic := pd.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	var physic_detail redfishstruct.PhysicalDrives
+// 	for _, physicdrive := range physic.Members {
+// 		fmt.Println(physicdrive.MemberOID)
+// 		physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+// 	}
+// }
+
+func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.PhysicalDrives) {
+	var pds redfishstruct.AllPhysicalDrives
+	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var physic_detail redfishstruct.PhysicalDrives
+	for _, physicdrive := range physic.Members {
+		fmt.Println(physicdrive.MemberOID)
+		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		status := config.State_dict[string(detail.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_storage_physical_drive_status,
+			prometheus.GaugeValue,
+			float64(status),
+			fmt.Sprintf("%v", detail.Id),
+			fmt.Sprintf("%v", detail.BlockSizeBytes),
+			fmt.Sprintf("%v", detail.CapacityLogicalBlocks),
+			fmt.Sprintf("%v", detail.CapacityMiB),
+			fmt.Sprintf("%v", detail.CarrierAuthenticationStatus),
+			fmt.Sprintf("%v", detail.CurrentTemperatureCelsius),
+			fmt.Sprintf("%v", detail.Description),
+			fmt.Sprintf("%v", detail.DiskDriveUse),
+			fmt.Sprintf("%v", detail.InterfaceSpeedMbps),
+			fmt.Sprintf("%v", detail.InterfaceType),
+			fmt.Sprintf("%v", detail.MaximumTemperatureCelsius),
+			fmt.Sprintf("%v", detail.MediaType),
+			fmt.Sprintf("%v", detail.Model),
+			fmt.Sprintf("%v", detail.Name),
+			fmt.Sprintf("%v", detail.PowerOnHours),
+			fmt.Sprintf("%v", detail.SerialNumber),
+			fmt.Sprintf("%v", detail.Status.Health),
+			fmt.Sprintf("%v", detail.Status.State),
+		)
+
+	}
+
+}

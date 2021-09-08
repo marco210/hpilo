@@ -14,7 +14,7 @@ import (
 	"github.com/stmcginnis/gofish"
 )
 
-var smart_storage redfishstruct.SmartStorage
+var smart_storage redfishstruct.AllPhysicalDrives
 
 func metrichandler(w http.ResponseWriter, r *http.Request) {
 	// var err error
@@ -39,8 +39,8 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 
 	defer config.GOFISH.Logout()
 
-	// smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures/0")
-	smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage")
+	smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+	//smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage")
 	fmt.Println(smartstorage)
 	bodyBytes, _ := ioutil.ReadAll(smartstorage.Body)
 	//fmt.Println(bodyBytes)
@@ -51,7 +51,7 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("%+v\n", smart_storage)
 
-	fmt.Printf(smart_storage.Description)
+	fmt.Printf("%+v\n %+v\n", smart_storage.Members[0], smart_storage.Members[1])
 
 	fmt.Println(" Connect successful")
 

@@ -1,5 +1,11 @@
 package redfishstruct
 
+import (
+	"encoding/json"
+	"hpilo_exporter/config"
+	"io/ioutil"
+)
+
 type ControllerBoard struct {
 	Status Status `json:"status"`
 }
@@ -40,4 +46,17 @@ type ArrayControllers struct {
 	SerialNumber                        string                 `json:"serialnumber"`
 	Status                              Status                 `json:"status"`
 	WriteCacheWithoutBackupPowerEnabled bool                   `json:"writecachewithoutbackuppowerenabled"`
+}
+
+func (arrayControllers *ArrayControllers) UnmarshalJson(str string) (error, *ArrayControllers) {
+	t, _ := config.GOFISH.Get(str)
+	bodyBytes, _ := ioutil.ReadAll(t.Body)
+
+	var temp ArrayControllers
+
+	err := json.Unmarshal(bodyBytes, &temp)
+	if err != nil {
+		panic(err)
+	}
+	return nil, &temp
 }

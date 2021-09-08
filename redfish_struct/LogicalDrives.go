@@ -1,5 +1,11 @@
 package redfishstruct
 
+import (
+	"encoding/json"
+	"hpilo_exporter/config"
+	"io/ioutil"
+)
+
 type DataDrives struct {
 	ODataID string `json:"@odata.id"`
 }
@@ -27,4 +33,17 @@ type LogicalDrives struct {
 	Status                    Status             `json:"status"`
 	StripeSizeBytes           string             `json:"stripesizebytes"`
 	VolumeUniqueIdentifier    string             `json:"volumeuniqueidentifier"`
+}
+
+func (logicalDrives *LogicalDrives) UnmarshalJson(str string) (error, *LogicalDrives) {
+	t, _ := config.GOFISH.Get(str)
+	bodyBytes, _ := ioutil.ReadAll(t.Body)
+
+	var temp LogicalDrives
+
+	err := json.Unmarshal(bodyBytes, &temp)
+	if err != nil {
+		panic(err)
+	}
+	return nil, &temp
 }
