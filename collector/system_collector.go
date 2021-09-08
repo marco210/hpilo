@@ -20,6 +20,10 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_ethernetinterface
 	ch <- config.S_network_adapter_status
 	ch <- config.S_networkport
+	ch <- config.S_storage_physical_drive_status
+	ch <- config.S_storage_array_controller_status
+	ch <- config.S_storage_logical_drive_status
+	ch <- config.S_storage_enclosures_status
 }
 
 func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
@@ -39,6 +43,9 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	}
 	sys_collector.collectPhysicalDriveStatus(ch, &redfishstruct.PhysicalDrives{})
+	sys_collector.collectArrayControllerStatus(ch, &redfishstruct.ArrayControllers{})
+	sys_collector.collectLogicalDriveStatus(ch, &redfishstruct.LogicalDrives{})
+	sys_collector.collectEnclosureStatus(ch, &redfishstruct.StorageEnclosures{})
 }
 
 func (collector SystemCollector) collectSystemHealth(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {
@@ -345,4 +352,115 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 
 	}
 
+}
+
+func (collector SystemCollector) collectArrayControllerStatus(ch chan<- prometheus.Metric, pd *redfishstruct.ArrayControllers) {
+	var pds redfishstruct.AllArrayController
+	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var physic_detail redfishstruct.ArrayControllers
+	for _, physicdrive := range physic.Members {
+		fmt.Println(physicdrive.MemberOID)
+		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		status := config.State_dict[string(detail.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_storage_array_controller_status,
+			prometheus.GaugeValue,
+			float64(status),
+			fmt.Sprintf("%v", detail.Id),
+			fmt.Sprintf("%v", detail.AdapterType),
+			fmt.Sprintf("%v", detail.ControllerBoard.Status.Health),
+			fmt.Sprintf("%v", detail.ControllerPartNumber),
+			fmt.Sprintf("%v", detail.CurrentOperatingMode),
+			fmt.Sprintf("%v", detail.Description),
+			fmt.Sprintf("%v", detail.DriveWriteCache),
+			fmt.Sprintf("%v", detail.ExternalPortCount),
+			fmt.Sprintf("%v", detail.FirmwareVersion.Current.VersionString),
+			fmt.Sprintf("%v", detail.InternalPortCount),
+			fmt.Sprintf("%v", detail.Location),
+			fmt.Sprintf("%v", detail.LocationFormat),
+			fmt.Sprintf("%v", detail.Model),
+			fmt.Sprintf("%v", detail.Name),
+			fmt.Sprintf("%v", detail.ReadCachePercent),
+			fmt.Sprintf("%v", detail.SerialNumber),
+			fmt.Sprintf("%v", detail.WriteCacheWithoutBackupPowerEnabled),
+			fmt.Sprintf("%v", detail.Status.Health),
+			fmt.Sprintf("%v", detail.Status.State),
+		)
+	}
+}
+
+func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.LogicalDrives) {
+	var pds redfishstruct.AllLogicalDrives
+	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var physic_detail redfishstruct.LogicalDrives
+	for _, physicdrive := range physic.Members {
+		fmt.Println(physicdrive.MemberOID)
+		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		status := config.State_dict[string(detail.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_storage_logical_drive_status,
+			prometheus.GaugeValue,
+			float64(status),
+			fmt.Sprintf("%v", detail.Id),
+			fmt.Sprintf("%v", detail.AccelerationMethod),
+			fmt.Sprintf("%v", detail.CapacityMiB),
+			fmt.Sprintf("%v", detail.Description),
+			fmt.Sprintf("%v", detail.InterfaceType),
+			fmt.Sprintf("%v", detail.LegacyBootPriority),
+			fmt.Sprintf("%v", detail.LogicalDriveEncryption),
+			fmt.Sprintf("%v", detail.LogicalDriveName),
+			fmt.Sprintf("%v", detail.LogicalDriveNumber),
+			fmt.Sprintf("%v", detail.LogicalDriveStatusReasons),
+			fmt.Sprintf("%v", detail.LogicalDriveType),
+			fmt.Sprintf("%v", detail.MediaType),
+			fmt.Sprintf("%v", detail.Name),
+			fmt.Sprintf("%v", detail.Raid),
+			fmt.Sprintf("%v", detail.StripeSizeBytes),
+			fmt.Sprintf("%v", detail.VolumeUniqueIdentifier),
+			fmt.Sprintf("%v", detail.Status.Health),
+			fmt.Sprintf("%v", detail.Status.State),
+		)
+	}
+}
+
+func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Metric, pd *redfishstruct.StorageEnclosures) {
+	var pds redfishstruct.AllStorageEnclosures
+	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var physic_detail redfishstruct.StorageEnclosures
+	for _, physicdrive := range physic.Members {
+		fmt.Println(physicdrive.MemberOID)
+		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		status := config.State_dict[string(detail.Status.Health)]
+		ch <- prometheus.MustNewConstMetric(config.S_storage_enclosures_status,
+			prometheus.GaugeValue,
+			float64(status),
+			fmt.Sprintf("%v", detail.Id),
+			fmt.Sprintf("%v", detail.Description),
+			fmt.Sprintf("%v", detail.DriveBayCount),
+			fmt.Sprintf("%v", detail.FirmwareVersion.Current.VersionString),
+			fmt.Sprintf("%v", detail.Location),
+			fmt.Sprintf("%v", detail.LocationFormat),
+			fmt.Sprintf("%v", detail.Model),
+			fmt.Sprintf("%v", detail.Name),
+			fmt.Sprintf("%v", detail.SerialNumber),
+			fmt.Sprintf("%v", detail.Status.Health),
+			fmt.Sprintf("%v", detail.Status.State),
+		)
+	}
 }

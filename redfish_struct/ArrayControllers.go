@@ -31,7 +31,10 @@ type ArrayControllers struct {
 	ODataType                           string                 `json:"@odata.type"`
 	Id                                  string                 `json:"id"`
 	AdapterType                         string                 `json:"adaptertype"`
+	BackupPowerSourceStatus             string                 `json:"backuppowersourcestatus"`
 	ControllerBoard                     ControllerBoard        `json:"controllerboard"`
+	ControllerPartNumber                string                 `json:"controllerpartnumber"`
+	CurrentOperatingMode                string                 `json:"currentoperatingmode"`
 	Description                         string                 `json:"description"`
 	DriveWriteCache                     string                 `json:"drivewritecache"`
 	ExternalPortCount                   int                    `json:"externalportcount"`

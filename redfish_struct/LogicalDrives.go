@@ -18,9 +18,11 @@ type LogicalDrives struct {
 	ODataID                   string             `json:"@odata.id"`
 	ODataType                 string             `json:"@odata.type"`
 	Id                        string             `json:"id"`
+	AccelerationMethod        string             `json:"accelerationmethod"`
 	CapacityMiB               int                `json:"capacitymib"`
 	Description               string             `json:"description"`
 	InterfaceType             string             `json:"interfacetype"`
+	LegacyBootPriority        string             `json:"legacybootpriority"`
 	Links                     Link_logical_drive `json:"links"`
 	LogicalDriveEncryption    bool               `json:"logicaldriveencryption"`
 	LogicalDriveName          string             `json:"logicaldrivename"`
@@ -31,7 +33,7 @@ type LogicalDrives struct {
 	Name                      string             `json:"name"`
 	Raid                      string             `json:"raid"`
 	Status                    Status             `json:"status"`
-	StripeSizeBytes           string             `json:"stripesizebytes"`
+	StripeSizeBytes           int                `json:"stripesizebytes"`
 	VolumeUniqueIdentifier    string             `json:"volumeuniqueidentifier"`
 }
 

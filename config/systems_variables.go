@@ -143,4 +143,74 @@ var (
 		},
 		nil,
 	)
+
+	S_storage_array_controller_status = prometheus.NewDesc(
+		"hpilo_system_storage_array_controller_status",
+		"System storage array controller {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"id",
+			"adapter_type",
+			"controller_board_status_health",
+			"controller_partnumber",
+			"description",
+			"firmware_version",
+			"external_port_count",
+			"hardware_revision",
+			"internal_port_count",
+			"location",
+			"location_format",
+			"model",
+			"name",
+			"read_cache_percent",
+			"serial_number",
+			"status_health",
+			"status_state",
+		},
+		nil,
+	)
+
+	S_storage_logical_drive_status = prometheus.NewDesc(
+		"hpilo_system_storage_logical_drive_status",
+		"System storage logical drive {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"id",
+			"acceleration_method",
+			"capacity_MiB",
+			"description",
+			"interface_type",
+			"legacy_boot_priority",
+			"logical_drive_encryption",
+			"logical_drive_name",
+			"logical_drive_number",
+			"logical_drive_status_reasons",
+			"logical_drive_type",
+			"media_type",
+			"name",
+			"raid",
+			"stripe_size_bytes",
+			"volume_unique_identifier",
+			"status_health",
+			"status_state",
+		},
+		nil,
+	)
+
+	S_storage_enclosures_status = prometheus.NewDesc(
+		"hpilo_system_storage_enclosures_status",
+		"System storage enclosures  {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"id",
+			"description",
+			"drive_bay_count",
+			"firmware_version",
+			"location",
+			"location_format",
+			"model",
+			"name",
+			"serial_number",
+			"status_health",
+			"status_state",
+		},
+		nil,
+	)
 )
