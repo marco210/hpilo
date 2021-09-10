@@ -74,8 +74,8 @@ func main() {
 	fmt.Printf("%v", system)
 	prometheus.Register(system)
 
-	//chassis := collector.Chassis{}
-	//prometheus.Register(chassis)
+	chassis := collector.Chassis{}
+	prometheus.Register(chassis)
 	fmt.Println(IP_ADDRESS)
 	// Starting server
 	http.HandleFunc("/metrics", metrichandler)

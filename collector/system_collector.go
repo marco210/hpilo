@@ -23,6 +23,7 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_storage_array_controller_status
 	ch <- config.S_storage_logical_drive_status
 	ch <- config.S_storage_enclosures_status
+
 	ch <- config.S_base_network_port_adapter_status
 }
 
