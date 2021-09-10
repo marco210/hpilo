@@ -22,8 +22,8 @@ type OemPhysicalPort struct {
 
 type PhysicalPort struct {
 	FullDuplex      bool            `json:"fullduplex"`
-	IPv4Addresses   string          `json:"ipv4address"`
-	IPv6Addresses   string          `json:"ipv6addresses"`
+	IPv4Addresses   []string        `json:"ipv4address"`
+	IPv6Addresses   []string        `json:"ipv6addresses"`
 	LinkStatus      string          `json:"linkstatus"`
 	MacAddress      string          `json:"macaddress"`
 	OemPhysicalPort OemPhysicalPort `json:"oem"`
