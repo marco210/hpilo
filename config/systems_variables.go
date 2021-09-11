@@ -156,6 +156,25 @@ var (
 		nil,
 	)
 
+	S_ilo_status = prometheus.NewDesc("hpilo_ilo_port_status",
+		"ilo port",
+		[]string{
+			"id",
+			"full_duplex_ilo",
+			"hostname_ilo",
+			"address_ilo",
+			"address_origin",
+			"gateway_ilo",
+			"subnetmask_ilo",
+			"speed_mbps",
+			"status_health",
+			"status_state",
+			"vlan_enable",
+			"vlan_id",
+		},
+		nil,
+	)
+
 	// S_storage => systems' storage
 	S_storage_physical_drive_status = prometheus.NewDesc(
 		"hpiloc_system_physic_drive_status",
