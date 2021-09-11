@@ -16,6 +16,8 @@ func (chassis Chassis) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.C_power_control
 	ch <- config.Chasis_status
 	ch <- config.C_fans_status
+	ch <- config.C_power_consume_by_each
+	ch <- config.C_power_consume_by_all
 }
 
 func (chass Chassis) Collect(ch chan<- prometheus.Metric) {
@@ -78,6 +80,7 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 			// "power_capacity_Watts",
 			// "serial_number",
 			// "status",
+
 			ch <- prometheus.MustNewConstMetric(config.C_power_line_input_voltage,
 				prometheus.GaugeValue,
 				float64(supply.LineInputVoltage),
@@ -91,6 +94,30 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 				fmt.Sprintf("%v", supply.SerialNumber),
 				fmt.Sprintf("%v", supply.Status.Health),
 			)
+
+			sup_temp := supply.Status.Health
+			sup_temp1 := 0.0
+			if sup_temp == "OK" {
+				sup_temp1 = 0
+			} else if sup_temp == "WARNING" {
+				sup_temp1 = 1
+			} else {
+				sup_temp1 = 2
+			}
+			ch <- prometheus.MustNewConstMetric(config.C_power_supply_status,
+				prometheus.GaugeValue,
+				float64(sup_temp1),
+				supply.MemberID,
+				fmt.Sprintf("%v", supply.LineInputVoltageType),
+				fmt.Sprintf("%v", supply.FirmwareVersion),
+				fmt.Sprintf("%v", supply.LastPowerOutputWatts),
+				fmt.Sprintf("%v", supply.Manufacturer),
+				fmt.Sprintf("%v", supply.Model),
+				fmt.Sprintf("%v", supply.PowerCapacityWatts),
+				fmt.Sprintf("%v", supply.SerialNumber),
+				fmt.Sprintf("%v", supply.Status.Health),
+			)
+
 		}
 
 		pw_controls := powers.PowerControl
@@ -105,6 +132,21 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 				fmt.Sprintf("%v", pw_control.PowerMetrics.AverageConsumedWatts),
 				fmt.Sprintf("%v", pw_control.PowerMetrics.MaxConsumedWatts),
 				fmt.Sprintf("%v", pw_control.PowerMetrics.MinConsumedWatts),
+			)
+			ch <- prometheus.MustNewConstMetric(config.C_power_consume_by_all,
+				prometheus.GaugeValue,
+				float64(pw_control.PowerConsumedWatts),
+				fmt.Sprintf("%v", pw_control.MemberID),
+				fmt.Sprintf("%v", pw_control.PowerCapacityWatts),
+				fmt.Sprintf("%v", pw_control.PowerConsumedWatts),
+			)
+
+			ch <- prometheus.MustNewConstMetric(config.C_power_consume_by_each,
+				prometheus.GaugeValue,
+				float64(pw_control.PowerConsumedWatts),
+				fmt.Sprintf("%v", pw_control.MemberID),
+				fmt.Sprintf("%v", pw_control.PowerCapacityWatts),
+				fmt.Sprintf("%v", pw_control.PowerMetrics.AverageConsumedWatts),
 			)
 		}
 

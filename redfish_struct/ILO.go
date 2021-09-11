@@ -14,7 +14,7 @@ type Ipv4Address struct {
 }
 
 type VLAN struct {
-	VLANEnable string `json:"vlanenable"`
+	VLANEnable bool   `json:"vlanenable"`
 	VLANId     string `json:"vlanid"`
 }
 
@@ -29,7 +29,7 @@ type ILOPort struct {
 	LinkStatus    string        `json:"linkstatus"`
 	MACAddress    string        `json:"macaddress"`
 	Name          string        `json:"name"`
-	SpeedMbps     string        `json:"speedmbps"`
+	SpeedMbps     int           `json:"speedmbps"`
 	Status        Status        `json:"status"`
 	VLAN          VLAN          `json:"vlan"`
 }

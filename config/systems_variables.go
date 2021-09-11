@@ -137,6 +137,7 @@ var (
 		nil,
 	)
 
+	//status
 	S_base_network_port_adapter_status = prometheus.NewDesc(
 		"hpilo_network_port_status",
 		"System network port{0: OK, 1: Warning, 2: Critical, None}",
@@ -155,7 +156,83 @@ var (
 		},
 		nil,
 	)
+	//hpilo_network_port_bad_receives
+	S_base_network_port_bad_receives = prometheus.NewDesc(
+		"hpilo_network_port_bad_receives",
+		"port bad receives",
+		[]string{
+			"id_adapter",
+			"port_number",
+			"ipv4address",
+			"macaddress",
+			"link_status",
+			"bad_receives",
+			"bad_transmits",
+			"good_receives",
+			"good_transmits",
+			"speed_mbps",
+			"status_health",
+		},
+		nil,
+	)
+	//hpilo_network_port_good_receives
+	S_base_network_port_good_receives = prometheus.NewDesc(
+		"hpilo_network_port_good_receives",
+		"port good receives",
+		[]string{
+			"id_adapter",
+			"port_number",
+			"ipv4address",
+			"macaddress",
+			"link_status",
+			"bad_receives",
+			"bad_transmits",
+			"good_receives",
+			"good_transmits",
+			"speed_mbps",
+			"status_health",
+		},
+		nil,
+	)
+	//hpilo_network_port_bad_transmits
+	S_base_network_port_bad_transmits = prometheus.NewDesc(
+		"hpilo_network_port_bad_transmits",
+		"port bad transmits",
+		[]string{
+			"id_adapter",
+			"port_number",
+			"ipv4address",
+			"macaddress",
+			"link_status",
+			"bad_receives",
+			"bad_transmits",
+			"good_receives",
+			"good_transmits",
+			"speed_mbps",
+			"status_health",
+		},
+		nil,
+	)
 
+	//hpilo_network_port_good_transmits
+	S_base_network_port_good_transmits = prometheus.NewDesc(
+		"hpilo_network_port_good_transmits",
+		"port good transmits",
+		[]string{
+			"id_adapter",
+			"port_number",
+			"ipv4address",
+			"macaddress",
+			"link_status",
+			"bad_receives",
+			"bad_transmits",
+			"good_receives",
+			"good_transmits",
+			"speed_mbps",
+			"status_health",
+		},
+		nil,
+	)
 	S_ilo_status = prometheus.NewDesc("hpilo_ilo_port_status",
 		"ilo port",
 		[]string{

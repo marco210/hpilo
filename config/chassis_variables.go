@@ -35,6 +35,24 @@ var (
 		},
 		nil,
 	)
+
+	C_power_supply_status = prometheus.NewDesc(
+		"hpilo_power_supply_status",
+		"Power Supply Status",
+		[]string{
+			"member_id",
+			"line_input_voltage_type",
+			"firmware_ersion",
+			"last_power_outputWatts",
+			"manufacturer",
+			"model",
+			"power_capacity_Watts",
+			"serial_number",
+			"status",
+		},
+		nil,
+	)
+
 	C_power_control = prometheus.NewDesc(
 		"hpilo_power_control",
 		"Power Capacity watts",
@@ -45,6 +63,27 @@ var (
 			"average_consumed_watts",
 			"max_consumed_watts",
 			"min_consumed_watts",
+		},
+		nil,
+	)
+	C_power_consume_by_all = prometheus.NewDesc(
+		"hpilo_power_consumed_by_all",
+		"Power Capacity watts",
+		[]string{
+			"member_id",
+			"power_capacity_watts",
+			"power_consumed_watts",
+		},
+		nil,
+	)
+
+	C_power_consume_by_each = prometheus.NewDesc(
+		"hpilo_power_consumed_by_each",
+		"Power Capacity watts",
+		[]string{
+			"member_id",
+			"power_capacity_watts",
+			"average_consumed_watts",
 		},
 		nil,
 	)
