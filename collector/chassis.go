@@ -18,6 +18,8 @@ func (chassis Chassis) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.C_fans_status
 	ch <- config.C_power_consume_by_each
 	ch <- config.C_power_consume_by_all
+	ch <- config.C_temperature_reading
+	ch <- config.C_power_supply_status
 }
 
 func (chass Chassis) Collect(ch chan<- prometheus.Metric) {
@@ -205,6 +207,19 @@ func (chassis Chassis) collectTemperature(ch chan<- prometheus.Metric, chass *re
 			ch <- prometheus.MustNewConstMetric(config.C_temperature_status,
 				prometheus.GaugeValue,
 				temperature_temp1,
+				fmt.Sprintf("%v", temp.MemberID),
+				fmt.Sprintf("%v", temp.Name),
+				fmt.Sprintf("%v", temp.ReadingCelsius),
+				fmt.Sprintf("%v", temp.SensorNumber),
+				string(temp.Status.Health),
+				string(temp.Status.State),
+				fmt.Sprintf("%v", temp.UpperThresholdCritical),
+				fmt.Sprintf("%v", temp.UpperThresholdFatal),
+			)
+
+			ch <- prometheus.MustNewConstMetric(config.C_temperature_reading,
+				prometheus.GaugeValue,
+				float64(temp.ReadingCelsius),
 				fmt.Sprintf("%v", temp.MemberID),
 				fmt.Sprintf("%v", temp.Name),
 				fmt.Sprintf("%v", temp.ReadingCelsius),

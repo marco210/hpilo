@@ -159,7 +159,7 @@ var (
 	//hpilo_network_port_bad_receives
 	S_base_network_port_bad_receives = prometheus.NewDesc(
 		"hpilo_network_port_bad_receives",
-		"port bad receives",
+		"A count of frames that were received by the adapter but which had an error",
 		[]string{
 			"id_adapter",
 			"port_number",
@@ -178,7 +178,7 @@ var (
 	//hpilo_network_port_good_receives
 	S_base_network_port_good_receives = prometheus.NewDesc(
 		"hpilo_network_port_good_receives",
-		"port good receives",
+		"A count of frames successfully received by the physical adapter",
 		[]string{
 			"id_adapter",
 			"port_number",
@@ -197,7 +197,7 @@ var (
 	//hpilo_network_port_bad_transmits
 	S_base_network_port_bad_transmits = prometheus.NewDesc(
 		"hpilo_network_port_bad_transmits",
-		"port bad transmits",
+		"A count of frames that were not transmitted by the adapter because of an error",
 		[]string{
 			"id_adapter",
 			"port_number",
@@ -217,7 +217,7 @@ var (
 	//hpilo_network_port_good_transmits
 	S_base_network_port_good_transmits = prometheus.NewDesc(
 		"hpilo_network_port_good_transmits",
-		"port good transmits",
+		"A count of frames successfully transmitted by the physical adapter",
 		[]string{
 			"id_adapter",
 			"port_number",
@@ -234,7 +234,7 @@ var (
 		nil,
 	)
 	S_ilo_status = prometheus.NewDesc("hpilo_ilo_port_status",
-		"ilo port",
+		"{0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",
 			"full_duplex_ilo",
@@ -254,7 +254,8 @@ var (
 
 	// S_storage => systems' storage
 	S_storage_physical_drive_status = prometheus.NewDesc(
-		"hpiloc_system_physic_drive_status",
+		//"hpiloc_system_physic_drive_status",
+		"hpilo_physical_drive_status",
 		"System storage physic_drive {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",
@@ -281,7 +282,8 @@ var (
 	)
 
 	S_storage_array_controller_status = prometheus.NewDesc(
-		"hpilo_system_storage_array_controller_status",
+		//"hpilo_system_storage_array_controller_status",
+		"hpilo_array_controller_status",
 		"System storage array controller {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",
@@ -306,7 +308,8 @@ var (
 	)
 
 	S_storage_logical_drive_status = prometheus.NewDesc(
-		"hpilo_system_storage_logical_drive_status",
+		//"hpilo_system_storage_logical_drive_status",
+		"hpilo_logical_drive_status",
 		"System storage logical drive {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",
@@ -332,7 +335,8 @@ var (
 	)
 
 	S_storage_enclosures_status = prometheus.NewDesc(
-		"hpilo_system_storage_enclosures_status",
+		//"hpilo_system_storage_enclosures_status",
+		"hpilo_storage_enclosure_status",
 		"System storage enclosures  {0: OK, 1: Warning, 2: Critical}",
 		[]string{
 			"id",

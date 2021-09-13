@@ -89,7 +89,7 @@ var (
 	)
 
 	C_fans_status = prometheus.NewDesc(
-		"hpilo_fans_status",
+		"hpilo_fan_status",
 		"status of fans",
 		[]string{
 			"member_id",
@@ -104,6 +104,22 @@ var (
 	C_temperature_status = prometheus.NewDesc(
 		"hpilo_temperature_status",
 		"Chassis temperature {0: OK, 1: Warning, 2: Critical}",
+		[]string{
+			"member_id",
+			"name",
+			"reading_celsius",
+			"sensor_number",
+			"status_health",
+			"status_state",
+			"upper_threshold_critical",
+			"upper_threshold_fatal",
+		},
+		nil,
+	)
+
+	C_temperature_reading = prometheus.NewDesc(
+		"hpilo_temperature_reading",
+		"The current reading of the temperature sensor in Celsius",
 		[]string{
 			"member_id",
 			"name",
