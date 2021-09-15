@@ -120,6 +120,14 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 				fmt.Sprintf("%v", supply.Status.Health),
 			)
 
+			ch <- prometheus.MustNewConstMetric(config.C_power_consume_by_each,
+				prometheus.GaugeValue,
+				float64(supply.LastPowerOutputWatts),
+				fmt.Sprintf("%v", supply.MemberID),
+				fmt.Sprintf("%v", supply.PowerCapacityWatts),
+				fmt.Sprintf("%v", supply.LastPowerOutputWatts),
+			)
+
 		}
 
 		pw_controls := powers.PowerControl
@@ -143,13 +151,6 @@ func (chasiss Chassis) collectPowerLineInputVoltage(ch chan<- prometheus.Metric,
 				fmt.Sprintf("%v", pw_control.PowerConsumedWatts),
 			)
 
-			ch <- prometheus.MustNewConstMetric(config.C_power_consume_by_each,
-				prometheus.GaugeValue,
-				float64(pw_control.PowerConsumedWatts),
-				fmt.Sprintf("%v", pw_control.MemberID),
-				fmt.Sprintf("%v", pw_control.PowerCapacityWatts),
-				fmt.Sprintf("%v", pw_control.PowerMetrics.AverageConsumedWatts),
-			)
 		}
 
 	}

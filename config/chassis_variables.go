@@ -68,7 +68,7 @@ var (
 	)
 	C_power_consume_by_all = prometheus.NewDesc(
 		"hpilo_power_consumed_by_all",
-		"Power Capacity watts",
+		"The actual power being consumed by the server in Watts",
 		[]string{
 			"member_id",
 			"power_capacity_watts",
@@ -79,11 +79,11 @@ var (
 
 	C_power_consume_by_each = prometheus.NewDesc(
 		"hpilo_power_consumed_by_each",
-		"Power Capacity watts",
+		"(LastPowerOutputWatts) The latest observed average power being drawn by the power supply (Watts)",
 		[]string{
 			"member_id",
 			"power_capacity_watts",
-			"average_consumed_watts",
+			"LastPowerOutputWatts",
 		},
 		nil,
 	)

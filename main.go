@@ -1,12 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"hpilo_exporter/collector"
 	"hpilo_exporter/config"
-	redfishstruct "hpilo_exporter/redfish_struct"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,7 +11,7 @@ import (
 	"github.com/stmcginnis/gofish"
 )
 
-var smart_storage redfishstruct.AllPhysicalDrives
+//var smart_storage redfishstruct.AllPhysicalDrives
 
 func metrichandler(w http.ResponseWriter, r *http.Request) {
 	// var err error
@@ -39,19 +36,19 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 
 	defer config.GOFISH.Logout()
 
-	smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
-	//smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage")
-	fmt.Println(smartstorage)
-	bodyBytes, _ := ioutil.ReadAll(smartstorage.Body)
-	//fmt.Println(bodyBytes)
-	err = json.Unmarshal(bodyBytes, &smart_storage)
-	if err != nil {
-		panic(err)
-	}
+	// smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+	// //smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage")
+	// fmt.Println(smartstorage)
+	// bodyBytes, _ := ioutil.ReadAll(smartstorage.Body)
+	// //fmt.Println(bodyBytes)
+	// err = json.Unmarshal(bodyBytes, &smart_storage)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	fmt.Printf("%+v\n", smart_storage)
+	// fmt.Printf("%+v\n", smart_storage)
 
-	fmt.Printf("%+v\n %+v\n", smart_storage.Members[0], smart_storage.Members[1])
+	// fmt.Printf("%+v\n %+v\n", smart_storage.Members[0], smart_storage.Members[1])
 
 	fmt.Println(" Connect successful")
 
