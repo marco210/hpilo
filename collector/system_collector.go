@@ -295,7 +295,7 @@ func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.
 
 func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.PhysicalDrives) {
 	var pds redfishstruct.AllPhysicalDrives
-	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
 
 	if err != nil {
 		panic(err)
@@ -304,7 +304,7 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 	var physic_detail redfishstruct.PhysicalDrives
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		physic_temp := string(detail.Status.Health)
 		physic_temp1 := 0.0
@@ -346,7 +346,7 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 
 func (collector SystemCollector) collectArrayControllerStatus(ch chan<- prometheus.Metric, pd *redfishstruct.ArrayControllers) {
 	var pds redfishstruct.AllArrayController
-	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
+	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
 
 	if err != nil {
 		panic(err)
@@ -355,7 +355,7 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 	var physic_detail redfishstruct.ArrayControllers
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		arr_temp := string(detail.Status.Health)
 		arr_temp1 := 0.0
@@ -393,7 +393,7 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 
 func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.LogicalDrives) {
 	var pds redfishstruct.AllLogicalDrives
-	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
+	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
 
 	if err != nil {
 		panic(err)
@@ -402,7 +402,7 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 	var physic_detail redfishstruct.LogicalDrives
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		logical_temp := string(detail.Status.Health)
 		logical_temp1 := 0.0
@@ -441,7 +441,7 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 
 func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Metric, pd *redfishstruct.StorageEnclosures) {
 	var pds redfishstruct.AllStorageEnclosures
-	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
+	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
 
 	if err != nil {
 		panic(err)
@@ -450,7 +450,7 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 	var physic_detail redfishstruct.StorageEnclosures
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		enclosure_temp := string(detail.Status.Health)
 		enclosure_temp1 := 0.0
@@ -482,7 +482,7 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 
 func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prometheus.Metric, pd *redfishstruct.BaseNetworkAdapter) {
 	var pds redfishstruct.AllBaseNetworkAdapter
-	err, physic := pds.UnmarshalJson("/redfish/v1/Systems/1/BaseNetworkAdapters")
+	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/BaseNetworkAdapters")
 
 	if err != nil {
 		panic(err)
@@ -491,7 +491,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 	var physic_detail redfishstruct.BaseNetworkAdapter
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		_, detail := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		nw_temp := string(detail.Status.Health)
 		nw_temp1 := 0.0
@@ -601,7 +601,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 
 func (collector SystemCollector) collectILOPortStatus(ch chan<- prometheus.Metric, pd *redfishstruct.ILOPort) {
 	var pds redfishstruct.ILOPort
-	err, iloports := pds.UnmarshalJson("/redfish/v1/Managers/1/EthernetInterfaces/1/")
+	iloports, err := pds.UnmarshalJson("/redfish/v1/Managers/1/EthernetInterfaces/1/")
 
 	if err != nil {
 		panic(err)

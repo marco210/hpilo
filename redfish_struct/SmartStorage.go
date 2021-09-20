@@ -30,15 +30,15 @@ type SmartStorage struct {
 	Status       Status             `json:"status"`
 }
 
-func (smartStorage *SmartStorage) UnmarshalJson(str string) (error, *SmartStorage) {
+func (smartStorage *SmartStorage) UnmarshalJson(str string) (*SmartStorage, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp SmartStorage
+	//var temp SmartStorage
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, smartStorage)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return smartStorage, nil
 }

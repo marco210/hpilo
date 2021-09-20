@@ -52,15 +52,15 @@ type ArrayControllers struct {
 	WriteCacheWithoutBackupPowerEnabled bool                   `json:"writecachewithoutbackuppowerenabled"`
 }
 
-func (arrayControllers *ArrayControllers) UnmarshalJson(str string) (error, *ArrayControllers) {
+func (arrayControllers *ArrayControllers) UnmarshalJson(str string) (*ArrayControllers, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp ArrayControllers
+	//var temp ArrayControllers
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, arrayControllers)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return arrayControllers, nil
 }

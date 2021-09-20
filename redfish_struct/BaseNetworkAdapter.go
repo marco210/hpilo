@@ -43,15 +43,15 @@ type BaseNetworkAdapter struct {
 	Status          Status          `json:"status"`
 }
 
-func (baseNetworkAdapter *BaseNetworkAdapter) UnmarshalJson(str string) (error, *BaseNetworkAdapter) {
+func (baseNetworkAdapter *BaseNetworkAdapter) UnmarshalJson(str string) (*BaseNetworkAdapter, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp BaseNetworkAdapter
+	//var temp BaseNetworkAdapter
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, baseNetworkAdapter)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return baseNetworkAdapter, nil
 }

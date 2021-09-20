@@ -34,15 +34,15 @@ type ILOPort struct {
 	VLAN          VLAN          `json:"vlan"`
 }
 
-func (iloport *ILOPort) UnmarshalJson(str string) (error, *ILOPort) {
+func (iloport *ILOPort) UnmarshalJson(str string) (*ILOPort, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp ILOPort
+	//var temp ILOPort
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, iloport)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return iloport, nil
 }

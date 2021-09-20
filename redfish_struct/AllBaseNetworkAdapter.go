@@ -15,15 +15,15 @@ type AllBaseNetworkAdapter struct {
 	Members_count int      `json:"members@odata.count"`
 }
 
-func (allBaseNetworkAdapter *AllBaseNetworkAdapter) UnmarshalJson(str string) (error, *AllBaseNetworkAdapter) {
+func (allBaseNetworkAdapter *AllBaseNetworkAdapter) UnmarshalJson(str string) (*AllBaseNetworkAdapter, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp AllBaseNetworkAdapter
+	//var temp AllBaseNetworkAdapter
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, allBaseNetworkAdapter)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return allBaseNetworkAdapter, nil
 }

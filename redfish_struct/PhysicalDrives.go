@@ -39,15 +39,15 @@ type PhysicalDrives struct {
 	UncorrectedWriteErrors            int             `json:"uncorrectedwriteerrors"`
 }
 
-func (physicalDrives *PhysicalDrives) UnmarshalJson(str string) (error, *PhysicalDrives) {
+func (physicalDrives *PhysicalDrives) UnmarshalJson(str string) (*PhysicalDrives, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp PhysicalDrives
+	//var temp PhysicalDrives
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, physicalDrives)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return physicalDrives, nil
 }

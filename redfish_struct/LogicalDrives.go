@@ -37,15 +37,15 @@ type LogicalDrives struct {
 	VolumeUniqueIdentifier    string             `json:"volumeuniqueidentifier"`
 }
 
-func (logicalDrives *LogicalDrives) UnmarshalJson(str string) (error, *LogicalDrives) {
+func (logicalDrives *LogicalDrives) UnmarshalJson(str string) (*LogicalDrives, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp LogicalDrives
+	//var temp LogicalDrives
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, logicalDrives)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return logicalDrives, nil
 }

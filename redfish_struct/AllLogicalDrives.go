@@ -15,15 +15,15 @@ type AllLogicalDrives struct {
 	Members_count int      `json:"members@odata.count"`
 }
 
-func (allLogicalDrives *AllLogicalDrives) UnmarshalJson(str string) (error, *AllLogicalDrives) {
+func (allLogicalDrives *AllLogicalDrives) UnmarshalJson(str string) (*AllLogicalDrives, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp AllLogicalDrives
+	//var temp AllLogicalDrives
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, allLogicalDrives)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return allLogicalDrives, nil
 }

@@ -15,15 +15,15 @@ type AllArrayController struct {
 	Members_count int      `json:"members@odata.count"`
 }
 
-func (allArrayController *AllArrayController) UnmarshalJson(str string) (error, *AllArrayController) {
+func (allArrayController *AllArrayController) UnmarshalJson(str string) (*AllArrayController, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp AllArrayController
+	//var temp AllArrayController
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, allArrayController)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return allArrayController, nil
 }

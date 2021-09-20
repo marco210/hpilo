@@ -21,15 +21,15 @@ type StorageEnclosures struct {
 	Status          Status          `json:"status"`
 }
 
-func (storageEnclosures *StorageEnclosures) UnmarshalJson(str string) (error, *StorageEnclosures) {
+func (storageEnclosures *StorageEnclosures) UnmarshalJson(str string) (*StorageEnclosures, error) {
 	t, _ := config.GOFISH.Get(str)
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
-	var temp StorageEnclosures
+	//var temp StorageEnclosures
 
-	err := json.Unmarshal(bodyBytes, &temp)
+	err := json.Unmarshal(bodyBytes, storageEnclosures)
 	if err != nil {
 		panic(err)
 	}
-	return nil, &temp
+	return storageEnclosures, nil
 }
