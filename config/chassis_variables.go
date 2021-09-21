@@ -101,6 +101,19 @@ var (
 		nil,
 	)
 
+	C_fans_reading = prometheus.NewDesc(
+		"hpilo_fan_speed",
+		"The current speed of the fan",
+		[]string{
+			"member_id",
+			"name",
+			"reading",
+			"status",
+			"state",
+		},
+		nil,
+	)
+
 	C_temperature_status = prometheus.NewDesc(
 		"hpilo_temperature_status",
 		"Chassis temperature {0: OK, 1: Warning, 2: Critical}",

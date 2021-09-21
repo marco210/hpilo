@@ -303,9 +303,11 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 
 	var physic_detail redfishstruct.PhysicalDrives
 	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
-
+		//fmt.Println(physicdrive.MemberOID)
+		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		if errPhysic != nil {
+			panic(errPhysic)
+		}
 		physic_temp := string(detail.Status.Health)
 		physic_temp1 := 0.0
 		if physic_temp == "OK" {
@@ -354,9 +356,12 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 
 	var physic_detail redfishstruct.ArrayControllers
 	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		//fmt.Println(physicdrive.MemberOID)
+		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
+		if errPhysic != nil {
+			panic(errPhysic)
+		}
 		arr_temp := string(detail.Status.Health)
 		arr_temp1 := 0.0
 		if arr_temp == "OK" {
@@ -401,8 +406,12 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 
 	var physic_detail redfishstruct.LogicalDrives
 	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		//fmt.Println(physicdrive.MemberOID)
+		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		if errPhysic != nil {
+			panic(errPhysic)
+		}
 
 		logical_temp := string(detail.Status.Health)
 		logical_temp1 := 0.0
@@ -449,8 +458,12 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 
 	var physic_detail redfishstruct.StorageEnclosures
 	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		//fmt.Println(physicdrive.MemberOID)
+		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		if errPhysic != nil {
+			panic(errPhysic)
+		}
 
 		enclosure_temp := string(detail.Status.Health)
 		enclosure_temp1 := 0.0
@@ -491,7 +504,11 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 	var physic_detail redfishstruct.BaseNetworkAdapter
 	for _, physicdrive := range physic.Members {
 		fmt.Println(physicdrive.MemberOID)
-		detail, _ := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+
+		if errPhysic != nil {
+			panic(errPhysic)
+		}
 
 		nw_temp := string(detail.Status.Health)
 		nw_temp1 := 0.0

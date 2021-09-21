@@ -185,6 +185,16 @@ func (chassis Chassis) collectFansStatus(ch chan<- prometheus.Metric, chass *red
 				fmt.Sprintf("%v", fan.Status.Health),
 				fmt.Sprintf("%v", fan.Status.State),
 			)
+			ch <- prometheus.MustNewConstMetric(
+				config.C_fans_reading,
+				prometheus.GaugeValue,
+				float64(fan.Reading),
+				fmt.Sprintf("%v", fan.MemberID),
+				fmt.Sprintf("%v", fan.Name),
+				fmt.Sprintf("%v", fan.Reading),
+				fmt.Sprintf("%v", fan.Status.Health),
+				fmt.Sprintf("%v", fan.Status.State),
+			)
 		}
 	}
 }
