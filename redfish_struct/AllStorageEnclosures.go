@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type AllStorageEnclosures struct {
@@ -16,14 +17,18 @@ type AllStorageEnclosures struct {
 }
 
 func (allStorageEnclosures *AllStorageEnclosures) UnmarshalJson(str string) (*AllStorageEnclosures, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp AllStorageEnclosures
 
 	err := json.Unmarshal(bodyBytes, allStorageEnclosures)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return allStorageEnclosures, nil
 }

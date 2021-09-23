@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type Status struct {
@@ -31,14 +32,18 @@ type SmartStorage struct {
 }
 
 func (smartStorage *SmartStorage) UnmarshalJson(str string) (*SmartStorage, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp SmartStorage
 
 	err := json.Unmarshal(bodyBytes, smartStorage)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return smartStorage, nil
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type Ipv4Address struct {
@@ -35,14 +36,18 @@ type ILOPort struct {
 }
 
 func (iloport *ILOPort) UnmarshalJson(str string) (*ILOPort, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp ILOPort
 
 	err := json.Unmarshal(bodyBytes, iloport)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return iloport, nil
 }

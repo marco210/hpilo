@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type DataDrives struct {
@@ -38,14 +39,18 @@ type LogicalDrives struct {
 }
 
 func (logicalDrives *LogicalDrives) UnmarshalJson(str string) (*LogicalDrives, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp LogicalDrives
 
 	err := json.Unmarshal(bodyBytes, logicalDrives)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return logicalDrives, nil
 }

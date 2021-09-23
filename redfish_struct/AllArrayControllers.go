@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type AllArrayController struct {
@@ -16,14 +17,18 @@ type AllArrayController struct {
 }
 
 func (allArrayController *AllArrayController) UnmarshalJson(str string) (*AllArrayController, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp AllArrayController
 
 	err := json.Unmarshal(bodyBytes, allArrayController)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return allArrayController, nil
 }

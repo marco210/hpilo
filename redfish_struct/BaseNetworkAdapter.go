@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hpilo_exporter/config"
 	"io/ioutil"
+	"log"
 )
 
 type HpePhysicalPort struct {
@@ -44,14 +45,18 @@ type BaseNetworkAdapter struct {
 }
 
 func (baseNetworkAdapter *BaseNetworkAdapter) UnmarshalJson(str string) (*BaseNetworkAdapter, error) {
-	t, _ := config.GOFISH.Get(str)
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
 
 	//var temp BaseNetworkAdapter
 
 	err := json.Unmarshal(bodyBytes, baseNetworkAdapter)
 	if err != nil {
-		panic(err)
+		log.Fatal("err:", err)
 	}
 	return baseNetworkAdapter, nil
 }

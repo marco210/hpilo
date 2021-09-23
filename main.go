@@ -37,7 +37,6 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 	defer config.GOFISH.Logout()
 
 	// smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
-	// //smartstorage, _ := config.GOFISH.Get("/redfish/v1/Systems/1/SmartStorage")
 	// fmt.Println(smartstorage)
 	// bodyBytes, _ := ioutil.ReadAll(smartstorage.Body)
 	// //fmt.Println(bodyBytes)
