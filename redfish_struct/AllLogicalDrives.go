@@ -29,6 +29,7 @@ func (allLogicalDrives *AllLogicalDrives) UnmarshalJson(str string) (*AllLogical
 	err := json.Unmarshal(bodyBytes, allLogicalDrives)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return allLogicalDrives, nil
+	return allLogicalDrives, err
 }

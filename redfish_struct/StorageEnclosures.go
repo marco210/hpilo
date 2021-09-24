@@ -35,6 +35,7 @@ func (storageEnclosures *StorageEnclosures) UnmarshalJson(str string) (*StorageE
 	err := json.Unmarshal(bodyBytes, storageEnclosures)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return storageEnclosures, nil
+	return storageEnclosures, err
 }

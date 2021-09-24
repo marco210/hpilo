@@ -53,6 +53,7 @@ func (physicalDrives *PhysicalDrives) UnmarshalJson(str string) (*PhysicalDrives
 	err := json.Unmarshal(bodyBytes, physicalDrives)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return physicalDrives, nil
+	return physicalDrives, err
 }

@@ -57,6 +57,7 @@ func (baseNetworkAdapter *BaseNetworkAdapter) UnmarshalJson(str string) (*BaseNe
 	err := json.Unmarshal(bodyBytes, baseNetworkAdapter)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return baseNetworkAdapter, nil
+	return baseNetworkAdapter, err
 }

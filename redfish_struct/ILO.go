@@ -48,6 +48,7 @@ func (iloport *ILOPort) UnmarshalJson(str string) (*ILOPort, error) {
 	err := json.Unmarshal(bodyBytes, iloport)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return iloport, nil
+	return iloport, err
 }

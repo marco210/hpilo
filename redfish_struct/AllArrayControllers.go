@@ -29,6 +29,7 @@ func (allArrayController *AllArrayController) UnmarshalJson(str string) (*AllArr
 	err := json.Unmarshal(bodyBytes, allArrayController)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return allArrayController, nil
+	return allArrayController, err
 }

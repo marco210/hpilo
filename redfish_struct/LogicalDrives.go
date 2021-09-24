@@ -51,6 +51,7 @@ func (logicalDrives *LogicalDrives) UnmarshalJson(str string) (*LogicalDrives, e
 	err := json.Unmarshal(bodyBytes, logicalDrives)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return logicalDrives, nil
+	return logicalDrives, err
 }

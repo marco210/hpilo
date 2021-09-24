@@ -82,7 +82,7 @@ func (collector SystemCollector) collectMemories(ch chan<- prometheus.Metric, v 
 	memories, err := v.Memory()
 
 	if nil != err {
-		panic(err)
+		return
 	}
 
 	if err == nil {
@@ -129,7 +129,7 @@ func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v
 	processors, err := v.Processors()
 
 	if nil != err {
-		panic(err)
+		return
 	}
 
 	if err == nil {
@@ -170,7 +170,7 @@ func (collector SystemCollector) collectProcessor(ch chan<- prometheus.Metric, v
 func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
 	ethernetInterfaces, ethernetErr := system.EthernetInterfaces()
 	if nil != ethernetErr {
-		panic(ethernetErr)
+		return
 	}
 
 	if 0 != len(ethernetInterfaces) {
@@ -458,7 +458,7 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 
 	var physic_detail redfishstruct.StorageEnclosures
 	for _, physicdrive := range physic.Members {
-		//fmt.Println(physicdrive.MemberOID)
+		fmt.Println(physicdrive.MemberOID)
 		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
 
 		if errPhysic != nil {

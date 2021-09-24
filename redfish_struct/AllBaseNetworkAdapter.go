@@ -29,7 +29,8 @@ func (allBaseNetworkAdapter *AllBaseNetworkAdapter) UnmarshalJson(str string) (*
 
 	err := json.Unmarshal(bodyBytes, allBaseNetworkAdapter)
 	if err != nil {
-		log.Fatal("err:", err_resp)
+		log.Fatal("err:", err)
+		return nil, err
 	}
-	return allBaseNetworkAdapter, nil
+	return allBaseNetworkAdapter, err
 }

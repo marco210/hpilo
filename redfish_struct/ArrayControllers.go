@@ -66,6 +66,7 @@ func (arrayControllers *ArrayControllers) UnmarshalJson(str string) (*ArrayContr
 	err := json.Unmarshal(bodyBytes, arrayControllers)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return arrayControllers, nil
+	return arrayControllers, err
 }

@@ -44,6 +44,7 @@ func (smartStorage *SmartStorage) UnmarshalJson(str string) (*SmartStorage, erro
 	err := json.Unmarshal(bodyBytes, smartStorage)
 	if err != nil {
 		log.Fatal("err:", err)
+		return nil, err
 	}
-	return smartStorage, nil
+	return smartStorage, err
 }
