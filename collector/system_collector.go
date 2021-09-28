@@ -20,8 +20,9 @@ func GetBody(str string) ([]byte, error) {
 	if err_resp != nil {
 		log.Fatal("err:", err_resp)
 	}
-	defer t.Body.Close()
+	//defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
+	defer t.Body.Close()
 	return bodyBytes, err_resp
 }
 
@@ -233,11 +234,13 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.PhysicalDrives
 	for _, physicdrive := range pds.Members {
@@ -246,11 +249,13 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 		if err != nil {
 			return
 		}
+		fmt.Println(body)
 
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
 		}
+		fmt.Printf("%+v\n", physic_detail)
 
 		physic_temp := string(physic_detail.Status.Health)
 		physic_temp1 := 0.0
@@ -299,11 +304,13 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.ArrayControllers
 	for _, physicdrive := range pds.Members {
@@ -313,11 +320,13 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 		if err != nil {
 			return
 		}
+		fmt.Println(body)
 
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
 		}
+		fmt.Printf("%+v\n", physic_detail)
 
 		arr_temp := string(physic_detail.Status.Health)
 		arr_temp1 := 0.0
@@ -362,11 +371,13 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.LogicalDrives
 	for _, physicdrive := range pds.Members {
@@ -375,11 +386,13 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 		if err != nil {
 			return
 		}
+		fmt.Println(body)
 
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
 		}
+		fmt.Printf("%+v\n", physic_detail)
 
 		logical_temp := string(physic_detail.Status.Health)
 		logical_temp1 := 0.0
@@ -425,11 +438,13 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.StorageEnclosures
 	for _, physicdrive := range pds.Members {
@@ -438,11 +453,13 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 		if err != nil {
 			return
 		}
+		fmt.Println(body)
 
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
 		}
+		fmt.Printf("%+v\n", physic_detail)
 
 		enclosure_temp := string(physic_detail.Status.Health)
 		enclosure_temp1 := 0.0
@@ -481,11 +498,13 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.BaseNetworkAdapter
 	for _, physicdrive := range pds.Members {
@@ -494,11 +513,13 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 		if err != nil {
 			return
 		}
+		fmt.Println(body)
 
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
 		}
+		fmt.Printf("%+v\n", physic_detail)
 
 		nw_temp := string(physic_detail.Status.Health)
 		nw_temp1 := 0.0
@@ -610,16 +631,18 @@ func (collector SystemCollector) collectILOPortStatus(ch chan<- prometheus.Metri
 	var pds redfishstruct.ILOPort
 	//iloports, err := pds.UnmarshalJson("/redfish/v1/Managers/1/EthernetInterfaces/1/")
 
-	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
+	body, err := GetBody("/redfish/v1/Managers/1/EthernetInterfaces/1/")
 
 	if err != nil {
 		return
 	}
+	fmt.Println(body)
 
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
 	}
+	fmt.Printf("%+v\n", pds)
 
 	ilo_temp := string(pds.Status.Health)
 	ilo_temp1 := 0.0
