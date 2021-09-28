@@ -29,6 +29,14 @@ func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
+
+	sys_collector.collectPhysicalDriveStatus(ch, &redfishstruct.PhysicalDrives{})
+	sys_collector.collectArrayControllerStatus(ch, &redfishstruct.ArrayControllers{})
+	sys_collector.collectLogicalDriveStatus(ch, &redfishstruct.LogicalDrives{})
+	sys_collector.collectEnclosureStatus(ch, &redfishstruct.StorageEnclosures{})
+	sys_collector.collectBaseNetworkAdapterStatus(ch, &redfishstruct.BaseNetworkAdapter{})
+	sys_collector.collectILOPortStatus(ch, &redfishstruct.ILOPort{})
+
 	metric := config.GOFISH.Service
 	systems, sysErr := metric.Systems() //Systems get the system instances from the service
 
@@ -44,13 +52,13 @@ func (sys_collector SystemCollector) Collect(ch chan<- prometheus.Metric) {
 		//sys_collector.collectorNetworks(ch, system)
 
 	}
-	sys_collector.collectPhysicalDriveStatus(ch, &redfishstruct.PhysicalDrives{})
-	sys_collector.collectArrayControllerStatus(ch, &redfishstruct.ArrayControllers{})
-	sys_collector.collectLogicalDriveStatus(ch, &redfishstruct.LogicalDrives{})
-	sys_collector.collectEnclosureStatus(ch, &redfishstruct.StorageEnclosures{})
-	sys_collector.collectBaseNetworkAdapterStatus(ch, &redfishstruct.BaseNetworkAdapter{})
-	//sys_collector.collectPortNetworkAdapterStatus(ch, &redfishstruct.BaseNetworkAdapter{})
-	sys_collector.collectILOPortStatus(ch, &redfishstruct.ILOPort{})
+	// sys_collector.collectPhysicalDriveStatus(ch, &redfishstruct.PhysicalDrives{})
+	// sys_collector.collectArrayControllerStatus(ch, &redfishstruct.ArrayControllers{})
+	// sys_collector.collectLogicalDriveStatus(ch, &redfishstruct.LogicalDrives{})
+	// sys_collector.collectEnclosureStatus(ch, &redfishstruct.StorageEnclosures{})
+	// sys_collector.collectBaseNetworkAdapterStatus(ch, &redfishstruct.BaseNetworkAdapter{})
+	// //sys_collector.collectPortNetworkAdapterStatus(ch, &redfishstruct.BaseNetworkAdapter{})
+	// sys_collector.collectILOPortStatus(ch, &redfishstruct.ILOPort{})
 }
 
 func (collector SystemCollector) collectSystemHealth(ch chan<- prometheus.Metric, v *redfish.ComputerSystem) {

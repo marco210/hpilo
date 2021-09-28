@@ -60,7 +60,7 @@ func metrichandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	const PORT = "9000"
+	const PORT = "9000" //9416
 	fmt.Println("Server listening at ", PORT)
 
 	// Listen all interfaces at port 9000
