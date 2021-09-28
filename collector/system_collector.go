@@ -1,9 +1,12 @@
 package collector
 
 import (
+	"encoding/json"
 	"fmt"
 	"hpilo_exporter/config"
 	redfishstruct "hpilo_exporter/redfish_struct"
+	"io/ioutil"
+	"log"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stmcginnis/gofish/redfish"
@@ -11,6 +14,16 @@ import (
 )
 
 type SystemCollector struct{}
+
+func GetBody(str string) ([]byte, error) {
+	t, err_resp := config.GOFISH.Get(str)
+	if err_resp != nil {
+		log.Fatal("err:", err_resp)
+	}
+	defer t.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(t.Body)
+	return bodyBytes, err_resp
+}
 
 func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- config.S_health
@@ -212,111 +225,34 @@ func (collector SystemCollector) collectEthernetInterfaces(ch chan<- prometheus.
 	}
 }
 
-// func (collector SystemCollector) collectorNetworks(ch chan<- prometheus.Metric, system *redfish.ComputerSystem) {
-// 	interfaces, err := system.NetworkInterfaces()
-
-// 	if nil != err {
-// 		panic(err)
-// 	}
-
-// 	if 0 != len(interfaces) {
-// 		collector.makeNetworkPortMetricFromNetworkInterfaces(ch, interfaces)
-// 	}
-// }
-
-// func (collector SystemCollector) makeNetworkPortMetricFromNetworkInterfaces(ch chan<- prometheus.Metric,
-// 	interfaces []*redfish.NetworkInterface) {
-// 	for _, netInterface := range interfaces {
-// 		adapter, err := netInterface.NetworkAdapter()
-
-// 		if nil != err {
-// 			panic(err)
-// 		}
-
-// 		if nil != adapter {
-// 			collector.collectNetworkPortMetricFromNetworkAdapter(ch, adapter)
-// 			collector.collectNetworkAdapterStatus(ch, adapter)
-// 		}
-// 	}
-// }
-
-// func (collector SystemCollector) collectNetworkPortMetricFromNetworkAdapter(ch chan<- prometheus.Metric,
-// 	adapter *redfish.NetworkAdapter) {
-// 	networkPorts, err := adapter.NetworkPorts()
-// 	netState := map[string]float64{"Up": 0.0, "Down": 1.0}
-
-// 	if nil != err {
-// 		panic(err)
-// 	}
-
-// 	for _, networkPort := range networkPorts {
-// 		stateString := fmt.Sprintf("%v", networkPort.LinkStatus)
-// 		status := netState[stateString]
-// 		ch <- prometheus.MustNewConstMetric(config.S_networkport,
-// 			prometheus.GaugeValue,
-// 			status,
-// 			adapter.Manufacturer,
-// 			fmt.Sprintf("%v", networkPort.LinkStatus),
-// 			fmt.Sprintf("%v", networkPort.CurrentLinkSpeedMbps),
-// 			networkPort.Description,
-// 			fmt.Sprintf("%v", networkPort.MaxFrameSize),
-// 			fmt.Sprintf("%v", networkPort.NumberDiscoveredRemotePorts),
-// 			networkPort.PhysicalPortNumber,
-// 			fmt.Sprintf("%v", networkPort.PortMaximumMTU),
-// 		)
-// 	}
-// }
-
-// func (collector SystemCollector) collectNetworkAdapterStatus(ch chan<- prometheus.Metric,
-// 	adapter *redfish.NetworkAdapter) {
-// 	controllers := adapter.Controllers
-
-// 	if 0 != len(controllers) {
-// 		for _, control := range controllers {
-// 			ch <- prometheus.MustNewConstMetric(config.S_network_adapter_status,
-// 				prometheus.GaugeValue,
-// 				float64(0),
-// 				adapter.Manufacturer,
-// 				control.FirmwarePackageVersion,
-// 				fmt.Sprintf("%v", control.NetworkDeviceFunctionsCount),
-// 				fmt.Sprintf("%v", control.NetworkPortsCount),
-// 			)
-// 		}
-// 	}
-// }
-
-//storage
-// func (collector SystemCollector) collectAllPhysicalDrive(ch chan<- prometheus.Metric,
-// 	pd *redfishstruct.AllPhysicalDrives) {
-// 	err, physic := pd.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	var physic_detail redfishstruct.PhysicalDrives
-// 	for _, physicdrive := range physic.Members {
-// 		fmt.Println(physicdrive.MemberOID)
-// 		physic_detail.UnmarshalJson(physicdrive.MemberOID)
-
-// 	}
-// }
-
 func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.PhysicalDrives) {
 	var pds redfishstruct.AllPhysicalDrives
-	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
+	//physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
 
+	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/DiskDrives")
 	if err != nil {
 		return
 	}
 
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
+
 	var physic_detail redfishstruct.PhysicalDrives
-	for _, physicdrive := range physic.Members {
+	for _, physicdrive := range pds.Members {
 		//fmt.Println(physicdrive.MemberOID)
-		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
-		if errPhysic != nil {
+		body, err := GetBody(physicdrive.MemberOID)
+		if err != nil {
 			return
 		}
-		physic_temp := string(detail.Status.Health)
+
+		err_unmashal := json.Unmarshal(body, &physic_detail)
+		if err_unmashal != nil {
+			return
+		}
+
+		physic_temp := string(physic_detail.Status.Health)
 		physic_temp1 := 0.0
 		if physic_temp == "OK" {
 			physic_temp1 = 0
@@ -329,25 +265,25 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 		ch <- prometheus.MustNewConstMetric(config.S_storage_physical_drive_status,
 			prometheus.GaugeValue,
 			float64(physic_temp1),
-			fmt.Sprintf("%v", detail.Id),
-			fmt.Sprintf("%v", detail.BlockSizeBytes),
-			fmt.Sprintf("%v", detail.CapacityGB),
-			fmt.Sprintf("%v", detail.CapacityLogicalBlocks),
-			fmt.Sprintf("%v", detail.CapacityMiB),
-			fmt.Sprintf("%v", detail.CarrierAuthenticationStatus),
-			fmt.Sprintf("%v", detail.CurrentTemperatureCelsius),
-			fmt.Sprintf("%v", detail.Description),
-			fmt.Sprintf("%v", detail.DiskDriveUse),
-			fmt.Sprintf("%v", detail.InterfaceSpeedMbps),
-			fmt.Sprintf("%v", detail.InterfaceType),
-			fmt.Sprintf("%v", detail.MaximumTemperatureCelsius),
-			fmt.Sprintf("%v", detail.MediaType),
-			fmt.Sprintf("%v", detail.Model),
-			fmt.Sprintf("%v", detail.Name),
-			fmt.Sprintf("%v", detail.PowerOnHours),
-			fmt.Sprintf("%v", detail.SerialNumber),
-			fmt.Sprintf("%v", detail.Status.Health),
-			fmt.Sprintf("%v", detail.Status.State),
+			fmt.Sprintf("%v", physic_detail.Id),
+			fmt.Sprintf("%v", physic_detail.BlockSizeBytes),
+			fmt.Sprintf("%v", physic_detail.CapacityGB),
+			fmt.Sprintf("%v", physic_detail.CapacityLogicalBlocks),
+			fmt.Sprintf("%v", physic_detail.CapacityMiB),
+			fmt.Sprintf("%v", physic_detail.CarrierAuthenticationStatus),
+			fmt.Sprintf("%v", physic_detail.CurrentTemperatureCelsius),
+			fmt.Sprintf("%v", physic_detail.Description),
+			fmt.Sprintf("%v", physic_detail.DiskDriveUse),
+			fmt.Sprintf("%v", physic_detail.InterfaceSpeedMbps),
+			fmt.Sprintf("%v", physic_detail.InterfaceType),
+			fmt.Sprintf("%v", physic_detail.MaximumTemperatureCelsius),
+			fmt.Sprintf("%v", physic_detail.MediaType),
+			fmt.Sprintf("%v", physic_detail.Model),
+			fmt.Sprintf("%v", physic_detail.Name),
+			fmt.Sprintf("%v", physic_detail.PowerOnHours),
+			fmt.Sprintf("%v", physic_detail.SerialNumber),
+			fmt.Sprintf("%v", physic_detail.Status.Health),
+			fmt.Sprintf("%v", physic_detail.Status.State),
 		)
 
 	}
@@ -356,21 +292,34 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 
 func (collector SystemCollector) collectArrayControllerStatus(ch chan<- prometheus.Metric, pd *redfishstruct.ArrayControllers) {
 	var pds redfishstruct.AllArrayController
-	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
+	//physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
+
+	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers")
 
 	if err != nil {
 		return
 	}
 
-	var physic_detail redfishstruct.ArrayControllers
-	for _, physicdrive := range physic.Members {
-		//fmt.Println(physicdrive.MemberOID)
-		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
 
-		if errPhysic != nil {
+	var physic_detail redfishstruct.ArrayControllers
+	for _, physicdrive := range pds.Members {
+		//fmt.Println(physicdrive.MemberOID)
+
+		body, err := GetBody(physicdrive.MemberOID)
+		if err != nil {
 			return
 		}
-		arr_temp := string(detail.Status.Health)
+
+		err_unmashal := json.Unmarshal(body, &physic_detail)
+		if err_unmashal != nil {
+			return
+		}
+
+		arr_temp := string(physic_detail.Status.Health)
 		arr_temp1 := 0.0
 		if arr_temp == "OK" {
 			arr_temp1 = 0
@@ -383,45 +332,56 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 		ch <- prometheus.MustNewConstMetric(config.S_storage_array_controller_status,
 			prometheus.GaugeValue,
 			float64(arr_temp1),
-			fmt.Sprintf("%v", detail.Id),
-			fmt.Sprintf("%v", detail.AdapterType),
-			fmt.Sprintf("%v", detail.ControllerBoard.Status.Health),
-			fmt.Sprintf("%v", detail.ControllerPartNumber),
-			fmt.Sprintf("%v", detail.Description),
-			fmt.Sprintf("%v", detail.FirmwareVersion.Current.VersionString),
-			fmt.Sprintf("%v", detail.ExternalPortCount),
-			fmt.Sprintf("%v", detail.HardwareRevision),
-			fmt.Sprintf("%v", detail.InternalPortCount),
-			fmt.Sprintf("%v", detail.Location),
-			fmt.Sprintf("%v", detail.LocationFormat),
-			fmt.Sprintf("%v", detail.Model),
-			fmt.Sprintf("%v", detail.Name),
-			fmt.Sprintf("%v", detail.ReadCachePercent),
-			fmt.Sprintf("%v", detail.SerialNumber),
-			fmt.Sprintf("%v", detail.Status.Health),
-			fmt.Sprintf("%v", detail.Status.State),
+			fmt.Sprintf("%v", physic_detail.Id),
+			fmt.Sprintf("%v", physic_detail.AdapterType),
+			fmt.Sprintf("%v", physic_detail.ControllerBoard.Status.Health),
+			fmt.Sprintf("%v", physic_detail.ControllerPartNumber),
+			fmt.Sprintf("%v", physic_detail.Description),
+			fmt.Sprintf("%v", physic_detail.FirmwareVersion.Current.VersionString),
+			fmt.Sprintf("%v", physic_detail.ExternalPortCount),
+			fmt.Sprintf("%v", physic_detail.HardwareRevision),
+			fmt.Sprintf("%v", physic_detail.InternalPortCount),
+			fmt.Sprintf("%v", physic_detail.Location),
+			fmt.Sprintf("%v", physic_detail.LocationFormat),
+			fmt.Sprintf("%v", physic_detail.Model),
+			fmt.Sprintf("%v", physic_detail.Name),
+			fmt.Sprintf("%v", physic_detail.ReadCachePercent),
+			fmt.Sprintf("%v", physic_detail.SerialNumber),
+			fmt.Sprintf("%v", physic_detail.Status.Health),
+			fmt.Sprintf("%v", physic_detail.Status.State),
 		)
 	}
 }
 
 func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.Metric, pd *redfishstruct.LogicalDrives) {
 	var pds redfishstruct.AllLogicalDrives
-	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
+	//physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
+
+	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/LogicalDrives")
 
 	if err != nil {
 		return
 	}
 
-	var physic_detail redfishstruct.LogicalDrives
-	for _, physicdrive := range physic.Members {
-		//fmt.Println(physicdrive.MemberOID)
-		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
 
-		if errPhysic != nil {
+	var physic_detail redfishstruct.LogicalDrives
+	for _, physicdrive := range pds.Members {
+		//fmt.Println(physicdrive.MemberOID)
+		body, err := GetBody(physicdrive.MemberOID)
+		if err != nil {
 			return
 		}
 
-		logical_temp := string(detail.Status.Health)
+		err_unmashal := json.Unmarshal(body, &physic_detail)
+		if err_unmashal != nil {
+			return
+		}
+
+		logical_temp := string(physic_detail.Status.Health)
 		logical_temp1 := 0.0
 		if logical_temp == "OK" {
 			logical_temp1 = 0
@@ -434,46 +394,57 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 		ch <- prometheus.MustNewConstMetric(config.S_storage_logical_drive_status,
 			prometheus.GaugeValue,
 			float64(logical_temp1),
-			fmt.Sprintf("%v", detail.Id),
-			fmt.Sprintf("%v", detail.AccelerationMethod),
-			fmt.Sprintf("%v", detail.CapacityMiB),
-			fmt.Sprintf("%v", detail.Description),
-			fmt.Sprintf("%v", detail.InterfaceType),
-			fmt.Sprintf("%v", detail.LegacyBootPriority),
-			fmt.Sprintf("%v", detail.LogicalDriveEncryption),
-			fmt.Sprintf("%v", detail.LogicalDriveName),
-			fmt.Sprintf("%v", detail.LogicalDriveNumber),
-			fmt.Sprintf("%v", detail.LogicalDriveStatusReasons),
-			fmt.Sprintf("%v", detail.LogicalDriveType),
-			fmt.Sprintf("%v", detail.MediaType),
-			fmt.Sprintf("%v", detail.Name),
-			fmt.Sprintf("%v", detail.Raid),
-			fmt.Sprintf("%v", detail.StripeSizeBytes),
-			fmt.Sprintf("%v", detail.VolumeUniqueIdentifier),
-			fmt.Sprintf("%v", detail.Status.Health),
-			fmt.Sprintf("%v", detail.Status.State),
+			fmt.Sprintf("%v", physic_detail.Id),
+			fmt.Sprintf("%v", physic_detail.AccelerationMethod),
+			fmt.Sprintf("%v", physic_detail.CapacityMiB),
+			fmt.Sprintf("%v", physic_detail.Description),
+			fmt.Sprintf("%v", physic_detail.InterfaceType),
+			fmt.Sprintf("%v", physic_detail.LegacyBootPriority),
+			fmt.Sprintf("%v", physic_detail.LogicalDriveEncryption),
+			fmt.Sprintf("%v", physic_detail.LogicalDriveName),
+			fmt.Sprintf("%v", physic_detail.LogicalDriveNumber),
+			fmt.Sprintf("%v", physic_detail.LogicalDriveStatusReasons),
+			fmt.Sprintf("%v", physic_detail.LogicalDriveType),
+			fmt.Sprintf("%v", physic_detail.MediaType),
+			fmt.Sprintf("%v", physic_detail.Name),
+			fmt.Sprintf("%v", physic_detail.Raid),
+			fmt.Sprintf("%v", physic_detail.StripeSizeBytes),
+			fmt.Sprintf("%v", physic_detail.VolumeUniqueIdentifier),
+			fmt.Sprintf("%v", physic_detail.Status.Health),
+			fmt.Sprintf("%v", physic_detail.Status.State),
 		)
 	}
 }
 
 func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Metric, pd *redfishstruct.StorageEnclosures) {
 	var pds redfishstruct.AllStorageEnclosures
-	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
+	//physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
+
+	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
 
 	if err != nil {
 		return
 	}
 
-	var physic_detail redfishstruct.StorageEnclosures
-	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
 
-		if errPhysic != nil {
+	var physic_detail redfishstruct.StorageEnclosures
+	for _, physicdrive := range pds.Members {
+
+		body, err := GetBody(physicdrive.MemberOID)
+		if err != nil {
 			return
 		}
 
-		enclosure_temp := string(detail.Status.Health)
+		err_unmashal := json.Unmarshal(body, &physic_detail)
+		if err_unmashal != nil {
+			return
+		}
+
+		enclosure_temp := string(physic_detail.Status.Health)
 		enclosure_temp1 := 0.0
 		if enclosure_temp == "OK" {
 			enclosure_temp1 = 0
@@ -486,39 +457,50 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 		ch <- prometheus.MustNewConstMetric(config.S_storage_enclosures_status,
 			prometheus.GaugeValue,
 			float64(enclosure_temp1),
-			fmt.Sprintf("%v", detail.Id),
-			fmt.Sprintf("%v", detail.Description),
-			fmt.Sprintf("%v", detail.DriveBayCount),
-			fmt.Sprintf("%v", detail.FirmwareVersion.Current.VersionString),
-			fmt.Sprintf("%v", detail.Location),
-			fmt.Sprintf("%v", detail.LocationFormat),
-			fmt.Sprintf("%v", detail.Model),
-			fmt.Sprintf("%v", detail.Name),
-			fmt.Sprintf("%v", detail.SerialNumber),
-			fmt.Sprintf("%v", detail.Status.Health),
-			fmt.Sprintf("%v", detail.Status.State),
+			fmt.Sprintf("%v", physic_detail.Id),
+			fmt.Sprintf("%v", physic_detail.Description),
+			fmt.Sprintf("%v", physic_detail.DriveBayCount),
+			fmt.Sprintf("%v", physic_detail.FirmwareVersion.Current.VersionString),
+			fmt.Sprintf("%v", physic_detail.Location),
+			fmt.Sprintf("%v", physic_detail.LocationFormat),
+			fmt.Sprintf("%v", physic_detail.Model),
+			fmt.Sprintf("%v", physic_detail.Name),
+			fmt.Sprintf("%v", physic_detail.SerialNumber),
+			fmt.Sprintf("%v", physic_detail.Status.Health),
+			fmt.Sprintf("%v", physic_detail.Status.State),
 		)
 	}
 }
 
 func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prometheus.Metric, pd *redfishstruct.BaseNetworkAdapter) {
 	var pds redfishstruct.AllBaseNetworkAdapter
-	physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/BaseNetworkAdapters")
+	//physic, err := pds.UnmarshalJson("/redfish/v1/Systems/1/BaseNetworkAdapters")
+
+	body, err := GetBody("/redfish/v1/Systems/1/BaseNetworkAdapters")
 
 	if err != nil {
 		return
 	}
 
-	var physic_detail redfishstruct.BaseNetworkAdapter
-	for _, physicdrive := range physic.Members {
-		fmt.Println(physicdrive.MemberOID)
-		detail, errPhysic := physic_detail.UnmarshalJson(physicdrive.MemberOID)
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
 
-		if errPhysic != nil {
+	var physic_detail redfishstruct.BaseNetworkAdapter
+	for _, physicdrive := range pds.Members {
+		fmt.Println(physicdrive.MemberOID)
+		body, err := GetBody(physicdrive.MemberOID)
+		if err != nil {
 			return
 		}
 
-		nw_temp := string(detail.Status.Health)
+		err_unmashal := json.Unmarshal(body, &physic_detail)
+		if err_unmashal != nil {
+			return
+		}
+
+		nw_temp := string(physic_detail.Status.Health)
 		nw_temp1 := 0.0
 		if nw_temp == "OK" {
 			nw_temp1 = 0
@@ -528,25 +510,25 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 			nw_temp1 = 2
 		}
 		//status := config.State_dict[string(detail.Status.Health)]
-		for i, v := range detail.PhysicalPorts {
+		for i, v := range physic_detail.PhysicalPorts {
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_adapter_status,
 				prometheus.GaugeValue,
 				float64(nw_temp1),
-				fmt.Sprintf("%v", detail.ID),
-				fmt.Sprintf("%v", detail.FirmwareVersion.Current.VersionString),
-				fmt.Sprintf("%v", detail.Name),
-				fmt.Sprintf("%v", detail.PartNumber),
+				fmt.Sprintf("%v", physic_detail.ID),
+				fmt.Sprintf("%v", physic_detail.FirmwareVersion.Current.VersionString),
+				fmt.Sprintf("%v", physic_detail.Name),
+				fmt.Sprintf("%v", physic_detail.PartNumber),
 				fmt.Sprintf("%v", v.LinkStatus),
 				fmt.Sprintf("%v", v.MacAddress),
-				fmt.Sprintf("%v", detail.SerialNumber),
-				fmt.Sprintf("%v", detail.Status.Health),
-				fmt.Sprintf("%v", detail.Status.State),
+				fmt.Sprintf("%v", physic_detail.SerialNumber),
+				fmt.Sprintf("%v", physic_detail.Status.Health),
+				fmt.Sprintf("%v", physic_detail.Status.State),
 			)
 
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_port_adapter_status,
 				prometheus.GaugeValue,
 				float64(nw_temp1),
-				fmt.Sprintf("%v", detail.ID),
+				fmt.Sprintf("%v", physic_detail.ID),
 				fmt.Sprintf("%v", i+1),
 				fmt.Sprintf("%v", v.IPv4Addresses),
 				fmt.Sprintf("%v", v.MacAddress),
@@ -562,7 +544,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_port_good_transmits,
 				prometheus.GaugeValue,
 				float64(v.OemPhysicalPort.HpePhysicalPort.GoodTransmits),
-				fmt.Sprintf("%v", detail.ID),
+				fmt.Sprintf("%v", physic_detail.ID),
 				fmt.Sprintf("%v", i+1),
 				fmt.Sprintf("%v", v.IPv4Addresses),
 				fmt.Sprintf("%v", v.MacAddress),
@@ -577,7 +559,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_port_bad_transmits,
 				prometheus.GaugeValue,
 				float64(v.OemPhysicalPort.HpePhysicalPort.BadTransmits),
-				fmt.Sprintf("%v", detail.ID),
+				fmt.Sprintf("%v", physic_detail.ID),
 				fmt.Sprintf("%v", i+1),
 				fmt.Sprintf("%v", v.IPv4Addresses),
 				fmt.Sprintf("%v", v.MacAddress),
@@ -592,7 +574,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_port_good_receives,
 				prometheus.GaugeValue,
 				float64(v.OemPhysicalPort.HpePhysicalPort.GoodReceives),
-				fmt.Sprintf("%v", detail.ID),
+				fmt.Sprintf("%v", physic_detail.ID),
 				fmt.Sprintf("%v", i+1),
 				fmt.Sprintf("%v", v.IPv4Addresses),
 				fmt.Sprintf("%v", v.MacAddress),
@@ -607,7 +589,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 			ch <- prometheus.MustNewConstMetric(config.S_base_network_port_bad_receives,
 				prometheus.GaugeValue,
 				float64(v.OemPhysicalPort.HpePhysicalPort.BadReceives),
-				fmt.Sprintf("%v", detail.ID),
+				fmt.Sprintf("%v", physic_detail.ID),
 				fmt.Sprintf("%v", i+1),
 				fmt.Sprintf("%v", v.IPv4Addresses),
 				fmt.Sprintf("%v", v.MacAddress),
@@ -626,12 +608,20 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 
 func (collector SystemCollector) collectILOPortStatus(ch chan<- prometheus.Metric, pd *redfishstruct.ILOPort) {
 	var pds redfishstruct.ILOPort
-	iloports, err := pds.UnmarshalJson("/redfish/v1/Managers/1/EthernetInterfaces/1/")
+	//iloports, err := pds.UnmarshalJson("/redfish/v1/Managers/1/EthernetInterfaces/1/")
+
+	body, err := GetBody("/redfish/v1/Systems/1/SmartStorage/ArrayControllers/0/StorageEnclosures")
 
 	if err != nil {
 		return
 	}
-	ilo_temp := string(iloports.Status.Health)
+
+	err_unmashal := json.Unmarshal(body, &pds)
+	if err_unmashal != nil {
+		return
+	}
+
+	ilo_temp := string(pds.Status.Health)
 	ilo_temp1 := 0.0
 	if ilo_temp == "OK" {
 		ilo_temp1 = 0
@@ -644,18 +634,18 @@ func (collector SystemCollector) collectILOPortStatus(ch chan<- prometheus.Metri
 	ch <- prometheus.MustNewConstMetric(config.S_ilo_status,
 		prometheus.GaugeValue,
 		float64(ilo_temp1),
-		fmt.Sprintf("%v", iloports.ID),
-		fmt.Sprintf("%v", iloports.FullDuplex),
-		fmt.Sprintf("%v", iloports.HostName),
-		fmt.Sprintf("%v", iloports.IPv4Addresses[0].Address),
-		fmt.Sprintf("%v", iloports.IPv4Addresses[0].AddressOrigin),
-		fmt.Sprintf("%v", iloports.IPv4Addresses[0].Gateway),
-		fmt.Sprintf("%v", iloports.IPv4Addresses[0].SubnetMask),
-		fmt.Sprintf("%v", iloports.SpeedMbps),
-		fmt.Sprintf("%v", iloports.Status.Health),
-		fmt.Sprintf("%v", iloports.Status.State),
-		fmt.Sprintf("%v", iloports.VLAN.VLANEnable),
-		fmt.Sprintf("%v", iloports.VLAN.VLANId),
+		fmt.Sprintf("%v", pds.ID),
+		fmt.Sprintf("%v", pds.FullDuplex),
+		fmt.Sprintf("%v", pds.HostName),
+		fmt.Sprintf("%v", pds.IPv4Addresses[0].Address),
+		fmt.Sprintf("%v", pds.IPv4Addresses[0].AddressOrigin),
+		fmt.Sprintf("%v", pds.IPv4Addresses[0].Gateway),
+		fmt.Sprintf("%v", pds.IPv4Addresses[0].SubnetMask),
+		fmt.Sprintf("%v", pds.SpeedMbps),
+		fmt.Sprintf("%v", pds.Status.Health),
+		fmt.Sprintf("%v", pds.Status.State),
+		fmt.Sprintf("%v", pds.VLAN.VLANEnable),
+		fmt.Sprintf("%v", pds.VLAN.VLANId),
 	)
 
 }
