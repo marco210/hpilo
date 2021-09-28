@@ -15,15 +15,19 @@ import (
 
 type SystemCollector struct{}
 
+// Lay body cua uri
 func GetBody(str string) ([]byte, error) {
+	var result []byte
+	defer fmt.Println(result)
 	t, err_resp := config.GOFISH.Get(str)
 	if err_resp != nil {
 		log.Fatal("err:", err_resp)
 	}
 	//defer t.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(t.Body)
+	result = bodyBytes
 	defer t.Body.Close()
-	return bodyBytes, err_resp
+	return result, err_resp
 }
 
 func (collector SystemCollector) Describe(ch chan<- *prometheus.Desc) {
@@ -236,6 +240,7 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 	}
 	fmt.Println(body)
 
+	// unmarshal body theo struct  AllPhysicalDrives
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
@@ -243,14 +248,20 @@ func (collector SystemCollector) collectPhysicalDriveStatus(ch chan<- prometheus
 	fmt.Printf("%+v\n", pds)
 
 	var physic_detail redfishstruct.PhysicalDrives
+	// goi []Members cua struc AllPhysicalDrives
 	for _, physicdrive := range pds.Members {
 		//fmt.Println(physicdrive.MemberOID)
+
+		// Get body memberOID (chi tiet tung DiskDrives)
+
 		body, err := GetBody(physicdrive.MemberOID)
 		if err != nil {
 			return
 		}
 		fmt.Println(body)
 
+		//unmarshal body theo struct PhysicalDrives
+		// Crash do k goi dung uri DiskDrives
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
@@ -306,6 +317,7 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 	}
 	fmt.Println(body)
 
+	//unmarshal body theo struct AllArrayController
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
@@ -322,6 +334,8 @@ func (collector SystemCollector) collectArrayControllerStatus(ch chan<- promethe
 		}
 		fmt.Println(body)
 
+		//unmarshal body theo struct ArrayControllers
+		//crash
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
@@ -373,6 +387,7 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 	}
 	fmt.Println(body)
 
+	//unmarshal body theo struct AllLogicalDrives
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
@@ -388,6 +403,8 @@ func (collector SystemCollector) collectLogicalDriveStatus(ch chan<- prometheus.
 		}
 		fmt.Println(body)
 
+		//unmarshal body theo struct LogicalDrives
+		// crash
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
@@ -440,6 +457,7 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 	}
 	fmt.Println(body)
 
+	//unmarshal body theo struct AllStorageEnclosures
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
@@ -455,6 +473,8 @@ func (collector SystemCollector) collectEnclosureStatus(ch chan<- prometheus.Met
 		}
 		fmt.Println(body)
 
+		//unmarshal body theo struct StorageEnclosures
+		//crash
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
@@ -500,6 +520,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 	}
 	fmt.Println(body)
 
+	//unmarshal body theo struct AllBaseNetworkAdapter
 	err_unmashal := json.Unmarshal(body, &pds)
 	if err_unmashal != nil {
 		return
@@ -515,6 +536,7 @@ func (collector SystemCollector) collectBaseNetworkAdapterStatus(ch chan<- prome
 		}
 		fmt.Println(body)
 
+		//unmarshal body theo struct BaseNetworkAdapter
 		err_unmashal := json.Unmarshal(body, &physic_detail)
 		if err_unmashal != nil {
 			return
